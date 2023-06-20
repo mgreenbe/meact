@@ -5,14 +5,27 @@ import {
 	Fragment,
 	createVNode,
 } from "/src/create-element.js";
-import { Component } from "/src/component.js";
 
+console.log("~~~~~\nMeact\n~~~~~");
 const EMPTY_OBJ = {};
 
 const parentDom = document.getElementById("meact-parent-dom");
-// const vnode = h("p", {}, "Yo, dude!");
 
-const vnode = h(Fragment, {}, [
+const observer = new MutationObserver((muts) => {
+	for (let mut of muts) {
+		console.log(mut);
+	}
+});
+
+observer.observe(parentDom, {
+	characterData: true,
+	characterDataOldValue: true,
+	attributes: true,
+	childList: true,
+	subtree: true,
+});
+
+let vnode = h(Fragment, {}, [
 	h("nav", {}, [h("a", { href: "/" }, "Home"), h("hr")]),
 	h(
 		"article",
@@ -23,6 +36,19 @@ const vnode = h(Fragment, {}, [
 ]);
 
 render(vnode, parentDom);
+
+render(vnode, parentDom);
+
+vnode = h(Fragment, {}, [
+	h("nav", {}, [h("a", { href: "/abc" }, "Home"), h("hr")]),
+	h("article", {}, "asdfasdfsdfasdfa"),
+	h("footer", {}, [h("hr"), h("p", {}, h("i", {}, "(c) Me 2023"))]),
+]);
+
+setTimeout(() => {
+	console.log("Rendering again");
+	render(vnode, parentDom);
+}, 1000);
 
 export function render(vnode, parentDom) {
 	let oldVNode = parentDom._children;
@@ -45,55 +71,19 @@ export function render(vnode, parentDom) {
 }
 
 export function diff(parentDom, newVNode, oldVNode, excessDomChildren, oldDom) {
-	const newType = newVNode.type;
-	let tmp;
+	if (newVNode.type === Fragment) {
+		let renderResult = newVNode.props.children;
 
-	if (typeof newType == "function") {
-		let c, isNew, oldProps;
-		let newProps = newVNode.props;
-
-		if (oldVNode._component) {
-			// todo
-		} else {
-			// Instantiate the new component
-			if ("prototype" in newType && newType.prototype.render) {
-				newVNode._component = c = new newType(newProps);
-			} else {
-				newVNode._component = c = new Component(newProps);
-				c.constructor = newType;
-				c.render = doRender;
-			}
-
-			c.props = newProps;
-			isNew = c._dirty = true;
-
-			oldProps = c.props;
-			c._vnode = newVNode;
-
-			if (isNew) {
-				// c.componentWillMount
-			} else {
-				// component update hooks
-			}
-
-			c.props = newProps;
-			c._parentDom = parentDom;
-
-			tmp = c.render(c.props);
-
-			let isTopLevelFragment =
-				tmp != null && tmp.type === Fragment && tmp.key == null;
-			let renderResult = isTopLevelFragment ? tmp.props.children : tmp;
-
-			diffChildren(
-				parentDom,
-				Array.isArray(renderResult) ? renderResult : [renderResult],
-				newVNode,
-				oldVNode,
-				excessDomChildren,
-				oldDom
-			);
-		}
+		diffChildren(
+			parentDom,
+			renderResult,
+			newVNode,
+			oldVNode,
+			excessDomChildren,
+			oldDom
+		);
+	} else if (typeof newType == "function") {
+		// todo
 	} else if (
 		excessDomChildren == null &&
 		newVNode._original === oldVNode._original
