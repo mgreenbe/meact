@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Preact</title>
+		<style>
+			body {
+				margin: 0px;
+			}
+			#columns {
+				display: flex;
+				height: 100vh;
+				align-items: stretch;
+			}
+			#left-column {
+				flex-basis: 50%;
+				padding-inline-start: 20px;
+				background-color: aliceblue;
+			}
+			#right-column {
+				flex-basis: 50%;
+				padding-inline-start: 20px;
+				background-color: cornsilk;
+			}
+		</style>
+	</head>
+	<script type="importmap">
+		{
+			"imports": {
+				"/src/render": "/src/render.js",
+				"/src/component": "/src/component.js",
+				"/src/clone-element": "/src/clone-element.js",
+				"/src/create-element": "/src/create-element.js",
+				"/src/create-context": "/src/create-context.js",
+				"/src/options": "/src/options.js",
+				"/src/constants": "/src/constants.js",
+				"/src/util": "/src/util.js",
+				"/src/diff/index": "/src/diff/index.js",
+				"/src/diff/props": "/src/diff/props.js",
+				"/src/diff/children": "/src/diff/children.js",
+				"/src/diff/catch-error": "/src/diff/catch-error.js"
+			}
+		}
+	</script>
+	<body>
+		<div id="columns">
+			<div id="left-column">
+				<h1>Preact</h1>
+				<div id="preact-parent-dom"></div>
+			</div>
+			<div id="right-column">
+				<h1>Meact</h1>
+				<div id="meact-parent-dom"></div>
+			</div>
+		</div>
+	</body>
+	<script type="module" src="/meact-driver.js"></script>
+	<script type="module" src="/preact-driver.js"></script>
+</html>
