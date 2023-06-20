@@ -21,7 +21,9 @@ let vnode = h(Fragment, {}, [
 	h("nav", {}, [h("a", { href: "/" }, "Home"), h("hr")]),
 	h(
 		"article",
-		{},
+		{
+			key: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...",
+		},
 		"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
 	),
 	h("footer", {}, [h("hr"), h("p", {}, h("i", {}, "(c) Me 2023"))]),
@@ -30,9 +32,16 @@ let vnode = h(Fragment, {}, [
 render(vnode, parentDom);
 
 vnode = h(Fragment, {}, [
-	h("nav", {}, [h("a", { href: "/abc" }, "Home"), h("hr")]),
+	h("nav", {}, [h("a", { href: "/abc" }, "Home")]),
 	h("article", {}, "asdfasdfsdfasdfa"),
-	h("footer", {}, [h("hr"), h("p", {}, h("i", {}, "(c) Me 2023"))]),
+	h(
+		"article",
+		{
+			key: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...",
+		},
+		"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
+	),
+	h("footer", {}, [h("hr"), h("p", {}, h("b", {}, "(c) Me 2023"))]),
 ]);
 
 setTimeout(() => {

@@ -18,6 +18,7 @@ const observer = new MutationObserver((muts) => {
 });
 
 observer.observe(parentDom, {
+	attributeOldValue: true,
 	characterData: true,
 	characterDataOldValue: true,
 	attributes: true,
@@ -29,7 +30,9 @@ let vnode = h(Fragment, {}, [
 	h("nav", {}, [h("a", { href: "/" }, "Home"), h("hr")]),
 	h(
 		"article",
-		{},
+		{
+			key: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...",
+		},
 		"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
 	),
 	h("footer", {}, [h("hr"), h("p", {}, h("i", {}, "(c) Me 2023"))]),
@@ -37,12 +40,17 @@ let vnode = h(Fragment, {}, [
 
 render(vnode, parentDom);
 
-render(vnode, parentDom);
-
 vnode = h(Fragment, {}, [
-	h("nav", {}, [h("a", { href: "/abc" }, "Home"), h("hr")]),
+	h("nav", {}, [h("a", { href: "/abc" }, "Home")]),
 	h("article", {}, "asdfasdfsdfasdfa"),
-	h("footer", {}, [h("hr"), h("p", {}, h("i", {}, "(c) Me 2023"))]),
+	h(
+		"article",
+		{
+			key: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...",
+		},
+		"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
+	),
+	h("footer", {}, [h("hr"), h("p", {}, h("b", {}, "(c) Me 2023"))]),
 ]);
 
 setTimeout(() => {
@@ -644,4 +652,52 @@ function placeChild(parentDom, newDom, oldDom) {
 	}
 
 	return newDom.nextSibling;
+}
+
+export function unmount(vnode, parentVNode, skipRemove) {
+	let r;
+
+	if ((r = vnode.ref)) {
+		if (!r.current || r.current === vnode._dom) {
+			applyRef(r, null, parentVNode);
+		}
+	}
+
+	if ((r = vnode._component) != null) {
+		if (r.componentWillUnmount) {
+			try {
+				r.componentWillUnmount();
+			} catch (e) {
+				options._catchError(e, parentVNode);
+			}
+		}
+
+		r.base = r._parentDom = null;
+		vnode._component = undefined;
+	}
+
+	if ((r = vnode._children)) {
+		for (let i = 0; i < r.length; i++) {
+			if (r[i]) {
+				unmount(
+					r[i],
+					parentVNode,
+					skipRemove || typeof vnode.type !== "function"
+				);
+			}
+		}
+	}
+
+	if (!skipRemove && vnode._dom != null) {
+		removeNode(vnode._dom);
+	}
+
+	// Must be set to `undefined` to properly clean up `_nextDom`
+	// for which `null` is a valid value. See comment in `create-element.js`
+	vnode._parent = vnode._dom = vnode._nextDom = undefined;
+}
+
+export function removeNode(node) {
+	let parentNode = node.parentNode;
+	if (parentNode) parentNode.removeChild(node);
 }
