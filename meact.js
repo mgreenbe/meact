@@ -7,6 +7,7 @@ export function render(vnode, parentDom) {
 	const newVNode = (parentDom._children = createElement(Fragment, null, [
 		vnode,
 	]));
+
 	const excessDomChildren = oldVNode
 		? null
 		: parentDom.firstChild
@@ -19,6 +20,7 @@ export function render(vnode, parentDom) {
 
 export function diff(parentDom, newVNode, oldVNode, excessDomChildren, oldDom) {
 	if (newVNode.type === Fragment) {
+		console.log("Fragment");
 		let renderResult = newVNode.props.children;
 
 		diffChildren(
@@ -44,6 +46,7 @@ export function diff(parentDom, newVNode, oldVNode, excessDomChildren, oldDom) {
 			oldVNode,
 			excessDomChildren
 		);
+		console.log(newVNode);
 	}
 }
 
@@ -146,7 +149,6 @@ export function diffChildren(
 			oldChildren[matchingIndex] = undefined;
 			remainingOldChildren--;
 		}
-
 		// Morph the old element into the new one, but don't append it to the dom yet
 		diff(parentDom, childVNode, oldVNode, excessDomChildren, oldDom);
 
@@ -296,6 +298,7 @@ function findMatchingIndex(
 }
 
 function diffElementNodes(dom, newVNode, oldVNode, excessDomChildren) {
+	console.log({ dom, newVNode, oldVNode, excessDomChildren });
 	let isHydrating = false;
 
 	let oldProps = oldVNode.props;
