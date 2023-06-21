@@ -4,8 +4,9 @@ console.log("~~~~~~\nPreact\n~~~~~~");
 const parentDom = document.getElementById("preact-parent-dom");
 
 // const vnode = "hi";
-const vnode = h(Fragment);
-render(vnode, parentDom);
+// const vnode = h(Fragment);
+// const vnode = true;
+// render(vnode, parentDom);
 // const observer = new MutationObserver((muts) => {
 // 	for (let mut of muts) {
 // 		console.log(mut);
@@ -20,19 +21,19 @@ render(vnode, parentDom);
 // 	subtree: true,
 // });
 
-// let vnode = h(Fragment, {}, [
-// 	h("nav", {}, [h("a", { href: "/" }, "Home"), h("hr")]),
-// 	h(
-// 		"article",
-// 		{
-// 			key: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...",
-// 		},
-// 		"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
-// 	),
-// 	h("footer", {}, [h("hr"), h("p", {}, h("i", {}, "(c) Me 2023"))]),
-// ]);
+let vnode = h(Fragment, {}, [
+	h("nav", {}, [h("a", { href: "/" }, "Home"), h("hr")]),
+	h(
+		"article",
+		{
+			key: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...",
+		},
+		"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
+	),
+	h("footer", {}, [h("hr"), h("p", {}, h("i", {}, "(c) Me 2023"))]),
+]);
 
-// render(vnode, parentDom);
+render(vnode, parentDom);
 
 // vnode = h(Fragment, {}, [
 // 	h("nav", {}, [h("a", { href: "/abc" }, "Home")]),
