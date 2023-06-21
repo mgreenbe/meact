@@ -3,7 +3,8 @@ import { createElement, Fragment } from "./create-element.js";
 export function render(vnode, parentDom) {
 	let oldVNode = parentDom._children;
 
-	vnode = parentDom._children = createElement(Fragment, null, [vnode]);
+	// vnode = parentDom._children = createElement(Fragment, null, [vnode]);
+	// parentDom._children = [vnode];
 
 	diff(
 		parentDom,
@@ -18,8 +19,4 @@ export function render(vnode, parentDom) {
 			: null, // excessDomChildren
 		oldVNode?._dom ?? parentDom.firstChild
 	);
-}
-
-export function diff(parentDom, newVNode, oldVNode, excessDomChildren, oldDom) {
-	newType = newVNode.type;
 }
