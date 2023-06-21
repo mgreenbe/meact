@@ -20,7 +20,6 @@ export function render(vnode, parentDom) {
 
 export function diff(parentDom, newVNode, oldVNode, excessDomChildren, oldDom) {
 	if (newVNode.type === Fragment) {
-		console.log("Fragment");
 		let renderResult = newVNode.props.children;
 
 		diffChildren(
@@ -46,7 +45,6 @@ export function diff(parentDom, newVNode, oldVNode, excessDomChildren, oldDom) {
 			oldVNode,
 			excessDomChildren
 		);
-		console.log(newVNode);
 	}
 }
 
@@ -298,7 +296,6 @@ function findMatchingIndex(
 }
 
 function diffElementNodes(dom, newVNode, oldVNode, excessDomChildren) {
-	console.log({ dom, newVNode, oldVNode, excessDomChildren });
 	let isHydrating = false;
 
 	let oldProps = oldVNode.props;
@@ -478,7 +475,7 @@ export function setProperty(dom, name, value, oldValue) {
 			name !== "colSpan" &&
 			name in dom
 		) {
-			return;
+			dom[name] = value;
 		}
 
 		// aria- and data- attributes have no boolean representation.
@@ -488,13 +485,14 @@ export function setProperty(dom, name, value, oldValue) {
 		// amount of exceptions would cost too many bytes. On top of
 		// that other frameworks generally stringify `false`.
 
-		if (typeof value === "function") {
-			// never serialize functions as attribute values
-		} else if (value != null && (value !== false || name[4] === "-")) {
-			dom.setAttribute(name, value);
-		} else {
-			dom.removeAttribute(name);
-		}
+		// if (typeof value === "function") {
+		// 	// never serialize functions as attribute values
+		// } else if (value != null && (value !== false || name[4] === "-")) {
+		// 	debugger;
+		// 	dom.setAttribute(name, value);
+		// } else {
+		// 	dom.removeAttribute(name);
+		// }
 	}
 }
 

@@ -3,7 +3,8 @@ import { render, h, Fragment } from "/src/index.js";
 console.log("~~~~~~\nPreact\n~~~~~~");
 const parentDom = document.getElementById("preact-parent-dom");
 
-const vnode = "hi";
+// const vnode = "hi";
+const vnode = h(Fragment);
 render(vnode, parentDom);
 // const observer = new MutationObserver((muts) => {
 // 	for (let mut of muts) {
