@@ -1,4 +1,3 @@
-import { createElement as h, Fragment } from "/src/create-element.js";
 import { render } from "./meact.js";
 
 console.log("~~~~~\nMeact\n~~~~~");

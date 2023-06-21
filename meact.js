@@ -1,4 +1,4 @@
-import { createElement, Fragment, createVNode } from "/src/create-element.js";
+import { createElement, Fragment, createVNode } from "./src/create-element.js";
 
 const EMPTY_OBJ = {};
 
