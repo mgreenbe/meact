@@ -1,41 +1,36 @@
-import { createElement, Fragment, createVNode } from "./src/create-element.js";
-
 export function render(vnode, parentDom) {
-	const newVNode = (parentDom._children = createElement(Fragment, null, [
-		vnode,
-	]));
+	const newVNode = createElement(Fragment, null, [vnode]);
 
 	diff(parentDom, newVNode);
 }
 
 export function diff(parentDom, newVNode) {
 	if (newVNode.type === Fragment) {
-		let renderResult = Array.isArray(newVNode.props.children)
-			? newVNode.props.children
-			: [newVNode.props.children];
-
-		diffChildren(parentDom, renderResult, newVNode);
+		diffChildren(parentDom, newVNode.props.children);
 	} else {
-		newVNode._dom = diffElementNodes(newVNode);
+		// newVNode._dom = diffElementNodes(newVNode);
+		const dom = diffElementNodes(newVNode);
+		return dom;
 	}
 }
 
-export function diffChildren(parentDom, renderResult) {
-	for (let childVNode of renderResult) {
+export function diffChildren(parentDom, childVNodes) {
+	for (let childVNode of childVNodes) {
 		if (childVNode == null || typeof childVNode == "boolean") {
 			continue;
 		} else if (
 			typeof childVNode === "string" ||
 			typeof childVNode === "number"
 		) {
-			childVNode = createVNode(null, childVNode, null, null, childVNode);
+			const newDom = document.createTextNode(childVNode);
+			parentDom.insertBefore(newDom, null);
+			continue;
 		}
 
-		diff(parentDom, childVNode, {});
+		const dom = diff(parentDom, childVNode, {});
 
-		const newDom = childVNode._dom;
-		if (newDom != null) {
-			parentDom.insertBefore(newDom, null);
+		if (childVNode.type !== Fragment) {
+			parentDom.insertBefore(dom, null);
 		}
 	}
 }
@@ -58,8 +53,22 @@ function diffElementNodes(newVNode) {
 		}
 	}
 
-	const i = newVNode.props.children;
-	diffChildren(dom, Array.isArray(i) ? i : [i], newVNode);
+	diffChildren(dom, newVNode.props.children, newVNode);
 
 	return dom;
+}
+
+export function createElement(type, props = {}, ...children) {
+	return createVNode(type, { ...props, children: children.flat() });
+}
+
+export function createVNode(type, props) {
+	return {
+		type,
+		props,
+	};
+}
+
+export function Fragment(props) {
+	return props.children;
 }

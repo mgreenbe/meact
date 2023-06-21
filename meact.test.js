@@ -1,7 +1,5 @@
 import "@testing-library/jest-dom";
-import { render } from "./meact.js";
-import { createElement as h, Fragment } from "./src/create-element.js";
-// import { render as preactRender } from "./src/index.js";
+import { render, createElement as h, Fragment } from "./meact.js";
 
 test("renders text", () => {
 	const c = document.createElement("div");

@@ -1,5 +1,5 @@
-import { render } from "./meact.js";
-import { createElement as h, Fragment } from "./src/create-element.js";
+import { render, createElement as h, Fragment } from "./meact.js";
+// import { createElement as h, Fragment } from "./src/create-element.js";
 
 console.log("~~~~~\nMeact\n~~~~~");
 
