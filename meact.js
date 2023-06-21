@@ -19,8 +19,9 @@ export function render(vnode, parentDom) {
 }
 
 export function diff(parentDom, newVNode, oldVNode, excessDomChildren, oldDom) {
+	// debugger;
 	if (newVNode.type === Fragment) {
-		let renderResult = newVNode.props.children;
+		let renderResult = newVNode.props.children ?? [];
 
 		diffChildren(
 			parentDom,

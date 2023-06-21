@@ -1,5 +1,5 @@
 import { render } from "./meact.js";
-import { createElement as h } from "./src/create-element.js";
+import { createElement as h, Fragment } from "./src/create-element.js";
 
 console.log("~~~~~\nMeact\n~~~~~");
 
@@ -33,7 +33,8 @@ const parentDom = document.getElementById("meact-parent-dom");
 // ]);
 
 // const vnode = "hi";
-const vnode = h("p", { className: "foo" }, "Hi, mom!");
+// const vnode = h("p", { className: "foo" }, "Hi, mom!");
+const vnode = h(Fragment);
 render(vnode, parentDom);
 
 // vnode = h(Fragment, {}, [

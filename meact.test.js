@@ -71,7 +71,7 @@ test("renders three nested divs", () => {
 	);
 });
 
-test.skip("renders an empty fragment", () => {
+test("renders an empty fragment", () => {
 	const c = document.createElement("div");
 	render(h(Fragment), c);
 	expect(c.innerHTML).toBe("");
