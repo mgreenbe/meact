@@ -36,7 +36,7 @@ const parentDom = document.getElementById("meact-parent-dom");
 // const vnode = h("p", { className: "foo" }, "Hi, mom!");
 // const vnode = h(Fragment);
 
-const vnode = "Hi, mom!";
+const vnode = h(Fragment, {}, h(Fragment));
 render(vnode, parentDom);
 
 // vnode = h(Fragment, {}, [
