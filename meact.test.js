@@ -19,6 +19,12 @@ test("renders a boolean", () => {
 	expect(c.innerHTML).toBe("");
 });
 
+test("renders null", () => {
+	const c = document.createElement("div");
+	render(null, c);
+	expect(c.innerHTML).toBe("");
+});
+
 test("renders empty p tag", () => {
 	const div = document.createElement("div");
 	const p = document.createElement("p");
