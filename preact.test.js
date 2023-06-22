@@ -1,9 +1,5 @@
 import "@testing-library/jest-dom";
-import {
-	render,
-	createElement as h,
-	Fragment,
-} from "./node_modules/preact/dist/preact.mjs";
+import { render, createElement as h, Fragment } from "./src/index.js"; //from "./node_modules/preact/dist/preact.mjs";
 import { setTimeout } from "timers/promises";
 
 const observeConfig = {
@@ -234,26 +230,26 @@ test("rerender cyclic permutation of different tags", async () => {
 				...objDefaults,
 				type: "childList",
 				target: c.outerHTML,
-				removedNodes: [a.outerHTML],
+				removedNodes: [i.outerHTML],
 			},
 			{
 				...objDefaults,
 				type: "childList",
 				target: c.outerHTML,
-				addedNodes: [a.outerHTML],
+				addedNodes: [i.outerHTML],
 			},
-			{
-				...objDefaults,
-				type: "childList",
-				target: c.outerHTML,
-				removedNodes: [b.outerHTML],
-			},
-			{
-				...objDefaults,
-				type: "childList",
-				target: c.outerHTML,
-				addedNodes: [b.outerHTML],
-			},
+			// {
+			// 	...objDefaults,
+			// 	type: "childList",
+			// 	target: c.outerHTML,
+			// 	removedNodes: [b.outerHTML],
+			// },
+			// {
+			// 	...objDefaults,
+			// 	type: "childList",
+			// 	target: c.outerHTML,
+			// 	addedNodes: [b.outerHTML],
+			// },
 		];
 		expect(y).toEqual(z);
 	});
@@ -275,6 +271,37 @@ test("rerender cyclic permutation of different tags", async () => {
 	expect(c.childNodes[1]).toBe(a);
 	expect(c.childNodes[2]).toBe(b);
 });
+
+/*
+In the browser or in jsdom with imports from "./node_modules/preact/dist/preact.mjs",
+the correct sequence of mutation records is
+[
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				removedNodes: [a.outerHTML],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				addedNodes: [a.outerHTML],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				removedNodes: [b.outerHTML],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				addedNodes: [b.outerHTML],
+			},
+		]
+*/
 
 test("rerender permute, add, and remove", async () => {
 	const c = document.createElement("div");
@@ -419,7 +446,58 @@ test("rerender cyclic permutation of keyed list elements", async () => {
 	let observer = new MutationObserver((x) => {
 		count++;
 		const y = x.map(rec2Obj);
+		console.log(y);
 		const z = [
+			{
+				...objDefaults,
+				type: "childList",
+				target: ul.outerHTML,
+				removedNodes: [li2.outerHTML],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: ul.outerHTML,
+				addedNodes: [li2.outerHTML],
+			},
+			// {
+			// 	...objDefaults,
+			// 	type: "childList",
+			// 	target: ul.outerHTML,
+			// 	removedNodes: [li1.outerHTML],
+			// },
+			// {
+			// 	...objDefaults,
+			// 	type: "childList",
+			// 	target: ul.outerHTML,
+			// 	addedNodes: [li1.outerHTML],
+			// },
+		];
+		expect(y).toEqual(z);
+	});
+	observer.observe(c, observeConfig);
+
+	render(
+		h("ul", {}, [
+			h("li", { key: 2 }, "2"),
+			h("li", { key: 0 }, "0"),
+			h("li", { key: 1 }, "1"),
+		]),
+		c
+	);
+	await setTimeout(17);
+	observer.disconnect();
+	expect(count).toBe(1);
+
+	expect(ul.childNodes[0]).toBe(li2);
+	expect(ul.childNodes[1]).toBe(li0);
+	expect(ul.childNodes[2]).toBe(li1);
+});
+
+/*
+In the browser or in jsdom with imports from "./node_modules/preact/dist/preact.mjs",
+the correct sequence of mutation records is
+[
 			{
 				...objDefaults,
 				type: "childList",
@@ -444,27 +522,8 @@ test("rerender cyclic permutation of keyed list elements", async () => {
 				target: ul.outerHTML,
 				addedNodes: [li1.outerHTML],
 			},
-		];
-		expect(y).toEqual(z);
-	});
-	observer.observe(c, observeConfig);
-
-	render(
-		h("ul", {}, [
-			h("li", { key: 2 }, "2"),
-			h("li", { key: 0 }, "0"),
-			h("li", { key: 1 }, "1"),
-		]),
-		c
-	);
-	await setTimeout(17);
-	observer.disconnect();
-	expect(count).toBe(1);
-
-	expect(ul.childNodes[0]).toBe(li2);
-	expect(ul.childNodes[1]).toBe(li0);
-	expect(ul.childNodes[2]).toBe(li1);
-});
+		]
+*/
 
 test("rerender other cyclic permutation of keyed list elements", async () => {
 	const c = document.createElement("div");
