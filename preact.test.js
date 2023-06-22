@@ -16,8 +16,8 @@ const observeConfig = {
 };
 
 const objDefaults = {
-	addedNodes: new Set([]),
-	removedNodes: new Set([]),
+	addedNodes: [],
+	removedNodes: [],
 	oldValue: null,
 	attributeName: null,
 };
@@ -25,8 +25,8 @@ const objDefaults = {
 function rec2Obj(x) {
 	const obj = {
 		type: x.type,
-		addedNodes: new Set(Array.from(x.addedNodes).map((x) => x.outerHTML)),
-		removedNodes: new Set(Array.from(x.removedNodes).map((x) => x.outerHTML)),
+		addedNodes: Array.from(x.addedNodes).map((x) => x.outerHTML),
+		removedNodes: Array.from(x.removedNodes).map((x) => x.outerHTML),
 		target: x.target instanceof Text ? x.target.data : x.target.outerHTML,
 		oldValue: x.oldValue,
 		attributeName: x.attributeName,
@@ -51,7 +51,7 @@ test("change text content of root", async () => {
 				target: "Yo, dude!",
 			},
 		];
-		expect(new Set(y)).toEqual(new Set(z));
+		expect(y).toEqual(z);
 	});
 	observer.observe(c, observeConfig);
 	render(h(Fragment, {}, "Yo, dude!"), c);
@@ -78,7 +78,7 @@ test("change text content of p", async () => {
 				target: "Yo, dude!",
 			},
 		];
-		expect(new Set(y)).toEqual(new Set(z));
+		expect(y).toEqual(z);
 	});
 	observer.observe(c, observeConfig);
 	render(h("p", {}, "Yo, dude!"), c);
@@ -106,7 +106,7 @@ test("change className of p", async () => {
 				target: `<p class="bar"></p>`,
 			},
 		];
-		expect(new Set(y)).toEqual(new Set(z));
+		expect(y).toEqual(z);
 	});
 	observer.observe(c, observeConfig);
 	render(h("p", { className: "bar" }), c);
@@ -130,23 +130,396 @@ test("rerender div to p", async () => {
 				...objDefaults,
 				type: "childList",
 				target: `<div><p id="two">Yo, dude!</p></div>`,
-				addedNodes: new Set([`<p id="two">Yo, dude!</p>`]),
+				addedNodes: [`<p id="two">Yo, dude!</p>`],
 			},
 			{
 				...objDefaults,
 				type: "childList",
 				target: `<div><p id="two">Yo, dude!</p></div>`,
-				removedNodes: new Set([`<div id="one">Hello, world!</div>`]),
+				removedNodes: [`<div id="one">Hello, world!</div>`],
 			},
 		];
-		expect(new Set(y)).toEqual(new Set(z));
+		expect(y).toEqual(z);
 	});
 	observer.observe(c, observeConfig);
 	render(h("p", { id: "two" }, "Yo, dude!"), c);
 	await setTimeout(17);
 	observer.disconnect();
-	// expect(c.innerHTML).toBe(`<p id="two">Yo, dude!</p>`);
-	// expect(count).toBe(1);
+	expect(c.innerHTML).toBe(`<p id="two">Yo, dude!</p>`);
+	expect(count).toBe(1);
+});
+
+test("rerender cyclic permutation of unkeyed list elements", async () => {
+	const c = document.createElement("div");
+
+	render(
+		h("ul", {}, [
+			h("li", { id: "zero" }, "0"),
+			h("li", { id: "one" }, "1"),
+			h("li", { id: "two" }, "2"),
+		]),
+		c
+	);
+
+	const ul = c.firstChild;
+	const li0 = c.querySelector("#zero");
+	const li1 = c.querySelector("#one");
+	const li2 = c.querySelector("#two");
+
+	let count = 0;
+	let observer = new MutationObserver((x) => {
+		count++;
+		const y = x.map(rec2Obj);
+		const z = [
+			{
+				...objDefaults,
+				type: "attributes",
+				attributeName: "id",
+				oldValue: "zero",
+				target: `<li id="two">0</li>`,
+			},
+			{
+				...objDefaults,
+				type: "attributes",
+				attributeName: "id",
+				oldValue: "one",
+				target: `<li id="zero">1</li>`,
+			},
+			{
+				...objDefaults,
+				type: "attributes",
+				attributeName: "id",
+				oldValue: "two",
+				target: `<li id="one">2</li>`,
+			},
+		];
+		expect(y).toEqual(z);
+	});
+	observer.observe(c, observeConfig);
+	render(
+		h("ul", {}, [
+			h("li", { id: "two" }, "0"),
+			h("li", { id: "zero" }, "1"),
+			h("li", { id: "one" }, "2"),
+		]),
+		c
+	);
+	await setTimeout(17);
+	observer.disconnect();
+	expect(count).toBe(1);
+});
+
+test("rerender cyclic permutation of different tags", async () => {
+	const c = document.createElement("div");
+
+	render(
+		h(Fragment, {}, [
+			h("a", {}, "\xa0a-0\xa0"),
+			h("b", {}, "\xa0b-1\xa0"),
+			h("i", {}, "\xa0i-2\xa0"),
+		]),
+		c
+	);
+
+	const a = c.childNodes[0];
+	const b = c.childNodes[1];
+	const i = c.childNodes[2];
+
+	let count = 0;
+	let observer = new MutationObserver((x) => {
+		count++;
+		const y = x.map(rec2Obj);
+		const z = [
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				removedNodes: [a.outerHTML],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				addedNodes: [a.outerHTML],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				removedNodes: [b.outerHTML],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				addedNodes: [b.outerHTML],
+			},
+		];
+		expect(y).toEqual(z);
+	});
+	observer.observe(c, observeConfig);
+
+	render(
+		h(Fragment, {}, [
+			h("i", {}, "\xa0i-2\xa0"),
+			h("a", {}, "\xa0a-0\xa0"),
+			h("b", {}, "\xa0b-1\xa0"),
+		]),
+		c
+	);
+	await setTimeout(17);
+	observer.disconnect();
+	expect(count).toBe(1);
+
+	expect(c.childNodes[0]).toBe(i);
+	expect(c.childNodes[1]).toBe(a);
+	expect(c.childNodes[2]).toBe(b);
+});
+
+test("rerender permute, add, and remove", async () => {
+	const c = document.createElement("div");
+
+	render(h(Fragment, {}, [h("a"), h("b"), h("i")]), c);
+
+	const a = c.childNodes[0];
+	const b = c.childNodes[1];
+	const i = c.childNodes[2];
+
+	let count = 0;
+	let observer = new MutationObserver((x) => {
+		count++;
+		const y = x.map(rec2Obj);
+		const z = [
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				addedNodes: [`<s></s>`],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				removedNodes: [`<a></a>`],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				addedNodes: [`<a></a>`],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				addedNodes: [`<b></b>`],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				addedNodes: [`<s></s>`],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				removedNodes: [`<i></i>`],
+			},
+		];
+		expect(y).toEqual(z);
+	});
+	observer.observe(c, observeConfig);
+
+	render(h(Fragment, {}, [h("b"), h("s"), h("a"), h("b"), h("s")]), c);
+	await setTimeout(17);
+	observer.disconnect();
+	expect(count).toBe(1);
+
+	expect(c.childNodes[0]).toBe(b);
+	console.log(c.childNodes[1].tagName, c.childNodes[4].tagName);
+	expect(c.childNodes[1]).not.toBe(c.childNodes[4]);
+	expect(c.childNodes[2]).toBe(a);
+	expect(c.childNodes[3]).not.toBe(b);
+});
+
+test("rerender other cyclic permutation of different tags", async () => {
+	const c = document.createElement("div");
+
+	render(
+		h(Fragment, {}, [
+			h("a", {}, "\xa0a-0\xa0"),
+			h("b", {}, "\xa0b-1\xa0"),
+			h("i", {}, "\xa0i-2\xa0"),
+		]),
+		c
+	);
+
+	const a = c.childNodes[0];
+	const b = c.childNodes[1];
+	const i = c.childNodes[2];
+
+	let count = 0;
+	let observer = new MutationObserver((x) => {
+		count++;
+		const y = x.map(rec2Obj);
+		const z = [
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				removedNodes: [a.outerHTML],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: c.outerHTML,
+				addedNodes: [a.outerHTML],
+			},
+		];
+		expect(y).toEqual(z);
+	});
+	observer.observe(c, observeConfig);
+
+	render(
+		h(Fragment, {}, [
+			h("b", {}, "\xa0b-1\xa0"),
+			h("i", {}, "\xa0i-2\xa0"),
+			h("a", {}, "\xa0a-0\xa0"),
+		]),
+		c
+	);
+	await setTimeout(17);
+	observer.disconnect();
+	expect(count).toBe(1);
+
+	expect(c.childNodes[0]).toBe(b);
+	expect(c.childNodes[1]).toBe(i);
+	expect(c.childNodes[2]).toBe(a);
+});
+
+test("rerender cyclic permutation of keyed list elements", async () => {
+	const c = document.createElement("div");
+
+	render(
+		h("ul", {}, [
+			h("li", { key: 0 }, "0"),
+			h("li", { key: 1 }, "1"),
+			h("li", { key: 2 }, "2"),
+		]),
+		c
+	);
+
+	const ul = c.querySelector("ul");
+	const li0 = ul.childNodes[0];
+	const li1 = ul.childNodes[1];
+	const li2 = ul.childNodes[2];
+
+	let count = 0;
+	let observer = new MutationObserver((x) => {
+		count++;
+		const y = x.map(rec2Obj);
+		const z = [
+			{
+				...objDefaults,
+				type: "childList",
+				target: ul.outerHTML,
+				removedNodes: [li0.outerHTML],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: ul.outerHTML,
+				addedNodes: [li0.outerHTML],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: ul.outerHTML,
+				removedNodes: [li1.outerHTML],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: ul.outerHTML,
+				addedNodes: [li1.outerHTML],
+			},
+		];
+		expect(y).toEqual(z);
+	});
+	observer.observe(c, observeConfig);
+
+	render(
+		h("ul", {}, [
+			h("li", { key: 2 }, "2"),
+			h("li", { key: 0 }, "0"),
+			h("li", { key: 1 }, "1"),
+		]),
+		c
+	);
+	await setTimeout(17);
+	observer.disconnect();
+	expect(count).toBe(1);
+
+	expect(ul.childNodes[0]).toBe(li2);
+	expect(ul.childNodes[1]).toBe(li0);
+	expect(ul.childNodes[2]).toBe(li1);
+});
+
+test("rerender other cyclic permutation of keyed list elements", async () => {
+	const c = document.createElement("div");
+
+	render(
+		h("ul", {}, [
+			h("li", { key: 0 }, "0"),
+			h("li", { key: 1 }, "1"),
+			h("li", { key: 2 }, "2"),
+		]),
+		c
+	);
+
+	const ul = c.querySelector("ul");
+	const li0 = ul.childNodes[0];
+	const li1 = ul.childNodes[1];
+	const li2 = ul.childNodes[2];
+
+	let count = 0;
+	let observer = new MutationObserver((x) => {
+		count++;
+		const y = x.map(rec2Obj);
+		const z = [
+			{
+				...objDefaults,
+				type: "childList",
+				target: ul.outerHTML,
+				removedNodes: [li0.outerHTML],
+			},
+			{
+				...objDefaults,
+				type: "childList",
+				target: ul.outerHTML,
+				addedNodes: [li0.outerHTML],
+			},
+		];
+		expect(y).toEqual(z);
+	});
+	observer.observe(c, observeConfig);
+
+	render(
+		h("ul", {}, [
+			h("li", { key: 1 }, "1"),
+			h("li", { key: 2 }, "2"),
+			h("li", { key: 0 }, "0"),
+		]),
+		c
+	);
+	await setTimeout(17);
+	observer.disconnect();
+	expect(count).toBe(1);
+
+	expect(ul.childNodes[0]).toBe(li1);
+	expect(ul.childNodes[1]).toBe(li2);
+	expect(ul.childNodes[2]).toBe(li0);
 });
 
 test("renders text", () => {
