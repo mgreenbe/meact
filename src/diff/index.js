@@ -47,7 +47,6 @@ function diffElementNodes(dom, newVNode, oldVNode) {
 		}
 		dom = document.createElement(nodeType, newProps.is && newProps);
 	}
-
 	if (nodeType === null) {
 		if (oldProps !== newProps) {
 			dom.data = newProps;
@@ -64,7 +63,6 @@ function diffElementNodes(dom, newVNode, oldVNode) {
 			oldVNode._children && getDomSibling(oldVNode, 0)
 		);
 	}
-
 	return dom;
 }
 
@@ -75,11 +73,16 @@ function diffElementNodes(dom, newVNode, oldVNode) {
  * @param {import('../internal').VNode} vnode
  */
 export function applyRef(ref, value, vnode) {
+<<<<<<< HEAD
 	if (typeof ref == "function") {
 		ref(value);
 	} else {
 		ref.current = value;
 	}
+=======
+	if (typeof ref == "function") ref(value);
+	else ref.current = value;
+>>>>>>> deleted
 }
 
 /**
@@ -102,11 +105,7 @@ export function unmount(vnode, parentVNode, skipRemove) {
 
 	if ((r = vnode._component) != null) {
 		if (r.componentWillUnmount) {
-			try {
-				r.componentWillUnmount();
-			} catch (e) {
-				// options._catchError(e, parentVNode);
-			}
+			r.componentWillUnmount();
 		}
 
 		r.base = r._parentDom = null;
@@ -132,9 +131,4 @@ export function unmount(vnode, parentVNode, skipRemove) {
 	// Must be set to `undefined` to properly clean up `_nextDom`
 	// for which `null` is a valid value. See comment in `create-element.js`
 	vnode._parent = vnode._dom = vnode._nextDom = undefined;
-}
-
-/** The `.render()` method for a PFC backing instance. */
-function doRender(props, state, context) {
-	return this.constructor(props, context);
 }
