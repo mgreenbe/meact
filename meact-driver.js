@@ -4,6 +4,8 @@ import { render, createElement as h, Fragment } from "./meact.js";
 console.log("~~~~~\nMeact\n~~~~~");
 
 const parentDom = document.getElementById("meact-parent-dom");
+render("Old Text", parentDom);
+render("New Text", parentDom);
 
 // const observer = new MutationObserver((muts) => {
 // 	for (let mut of muts) {

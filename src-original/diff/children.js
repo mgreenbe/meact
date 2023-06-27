@@ -1,7 +1,7 @@
-import { diff, unmount, applyRef } from "./index";
-import { createVNode, Fragment } from "../create-element";
-import { EMPTY_OBJ, EMPTY_ARR } from "../constants";
-import { isArray } from "../util";
+import { diff, unmount, applyRef } from './index';
+import { createVNode, Fragment } from '../create-element';
+import { EMPTY_OBJ, EMPTY_ARR } from '../constants';
+import { isArray } from '../util';
 
 /**
  * Diff the children of a virtual node
@@ -58,8 +58,8 @@ export function diffChildren(
 
 		if (
 			childVNode == null ||
-			typeof childVNode == "boolean" ||
-			typeof childVNode == "function"
+			typeof childVNode == 'boolean' ||
+			typeof childVNode == 'function'
 		) {
 			childVNode = newParentVNode._children[i] = null;
 		}
@@ -67,10 +67,10 @@ export function diffChildren(
 		// or we are rendering a component (e.g. setState) copy the oldVNodes so it can have
 		// it's own DOM & etc. pointers
 		else if (
-			typeof childVNode == "string" ||
-			typeof childVNode == "number" ||
+			typeof childVNode == 'string' ||
+			typeof childVNode == 'number' ||
 			// eslint-disable-next-line valid-typeof
-			typeof childVNode == "bigint"
+			typeof childVNode == 'bigint'
 		) {
 			childVNode = newParentVNode._children[i] = createVNode(
 				null,
@@ -188,12 +188,12 @@ export function diffChildren(
 				hasMatchingIndex || (matchingIndex == i && !isMounting);
 
 			if (
-				typeof childVNode.type == "function" &&
+				typeof childVNode.type == 'function' &&
 				(matchingIndex !== skewedIndex ||
 					oldVNode._children === childVNode._children)
 			) {
 				oldDom = reorderChildren(childVNode, oldDom, parentDom);
-			} else if (typeof childVNode.type != "function" && !hasMatchingIndex) {
+			} else if (typeof childVNode.type != 'function' && !hasMatchingIndex) {
 				oldDom = placeChild(parentDom, newDom, oldDom);
 			} else if (childVNode._nextDom !== undefined) {
 				// Only Fragments or components that return Fragment like VNodes will
@@ -210,7 +210,7 @@ export function diffChildren(
 				oldDom = newDom.nextSibling;
 			}
 
-			if (typeof newParentVNode.type == "function") {
+			if (typeof newParentVNode.type == 'function') {
 				// Because the newParentVNode is Fragment-like, we need to set it's
 				// _nextDom property to the nextSibling of its last child DOM node.
 				//
@@ -229,7 +229,7 @@ export function diffChildren(
 	for (i = oldChildrenLength; i--; ) {
 		if (oldChildren[i] != null) {
 			if (
-				typeof newParentVNode.type == "function" &&
+				typeof newParentVNode.type == 'function' &&
 				oldChildren[i]._dom != null &&
 				oldChildren[i]._dom == newParentVNode._nextDom
 			) {
@@ -266,7 +266,7 @@ function reorderChildren(childVNode, oldDom, parentDom) {
 			// (childVNode here).
 			vnode._parent = childVNode;
 
-			if (typeof vnode.type == "function") {
+			if (typeof vnode.type == 'function') {
 				oldDom = reorderChildren(vnode, oldDom, parentDom);
 			} else {
 				oldDom = placeChild(parentDom, vnode._dom, oldDom);
@@ -285,9 +285,9 @@ function reorderChildren(childVNode, oldDom, parentDom) {
  */
 export function toChildArray(children, out) {
 	out = out || [];
-	if (children == null || typeof children == "boolean") {
+	if (children == null || typeof children == 'boolean') {
 	} else if (isArray(children)) {
-		children.some((child) => {
+		children.some(child => {
 			toChildArray(child, out);
 		});
 	} else {

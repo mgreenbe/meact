@@ -1,10 +1,10 @@
-import { EMPTY_OBJ } from "../constants";
-import { Component, getDomSibling } from "../component";
-import { Fragment } from "../create-element";
-import { diffChildren } from "./children";
-import { diffProps, setProperty } from "./props";
-import { assign, isArray, removeNode, slice } from "../util";
-import options from "../options";
+import { EMPTY_OBJ } from '../constants';
+import { Component, getDomSibling } from '../component';
+import { Fragment } from '../create-element';
+import { diffChildren } from './children';
+import { diffProps, setProperty } from './props';
+import { assign, isArray, removeNode, slice } from '../util';
+import options from '../options';
 
 /**
  * Diff two virtual nodes and apply proper changes to the DOM
@@ -52,7 +52,7 @@ export function diff(
 	if ((tmp = options._diff)) tmp(newVNode);
 
 	try {
-		outer: if (typeof newType == "function") {
+		outer: if (typeof newType == 'function') {
 			let c, isNew, oldProps, oldState, snapshot, clearProcessingException;
 			let newProps = newVNode.props;
 
@@ -72,7 +72,7 @@ export function diff(
 				clearProcessingException = c._processingException = c._pendingError;
 			} else {
 				// Instantiate the new component
-				if ("prototype" in newType && newType.prototype.render) {
+				if ('prototype' in newType && newType.prototype.render) {
 					// @ts-ignore The check above verifies that newType is suppose to be constructed
 					newVNode._component = c = new newType(newProps, componentContext); // eslint-disable-line new-cap
 				} else {
@@ -156,7 +156,7 @@ export function diff(
 
 					newVNode._dom = oldVNode._dom;
 					newVNode._children = oldVNode._children;
-					newVNode._children.forEach((vnode) => {
+					newVNode._children.forEach(vnode => {
 						if (vnode) vnode._parent = newVNode;
 					});
 
@@ -190,7 +190,7 @@ export function diff(
 
 			let renderHook = options._render,
 				count = 0;
-			if ("prototype" in newType && newType.prototype.render) {
+			if ('prototype' in newType && newType.prototype.render) {
 				c.state = c._nextState;
 				c._dirty = false;
 
@@ -296,12 +296,12 @@ export function diff(
 export function commitRoot(commitQueue, root) {
 	if (options._commit) options._commit(root, commitQueue);
 
-	commitQueue.some((c) => {
+	commitQueue.some(c => {
 		try {
 			// @ts-ignore Reuse the commitQueue variable here so the type changes
 			commitQueue = c._renderCallbacks;
 			c._renderCallbacks = [];
-			commitQueue.some((cb) => {
+			commitQueue.some(cb => {
 				// @ts-ignore See above ts-ignore on commitQueue
 				cb.call(c);
 			});
@@ -341,7 +341,7 @@ function diffElementNodes(
 	let i = 0;
 
 	// Tracks entering and exiting SVG namespace when descending through the tree.
-	if (nodeType === "svg") isSvg = true;
+	if (nodeType === 'svg') isSvg = true;
 
 	if (excessDomChildren != null) {
 		for (; i < excessDomChildren.length; i++) {
@@ -352,7 +352,7 @@ function diffElementNodes(
 			// excessDomChildren so it isn't later removed in diffChildren
 			if (
 				child &&
-				"setAttribute" in child === !!nodeType &&
+				'setAttribute' in child === !!nodeType &&
 				(nodeType ? child.localName === nodeType : child.nodeType === 3)
 			) {
 				dom = child;
@@ -370,7 +370,7 @@ function diffElementNodes(
 
 		if (isSvg) {
 			dom = document.createElementNS(
-				"http://www.w3.org/2000/svg",
+				'http://www.w3.org/2000/svg',
 				// @ts-ignore We know `newVNode.type` is a string
 				nodeType
 			);
@@ -421,7 +421,7 @@ function diffElementNodes(
 					((!oldHtml || newHtml.__html != oldHtml.__html) &&
 						newHtml.__html !== dom.innerHTML)
 				) {
-					dom.innerHTML = (newHtml && newHtml.__html) || "";
+					dom.innerHTML = (newHtml && newHtml.__html) || '';
 				}
 			}
 		}
@@ -439,7 +439,7 @@ function diffElementNodes(
 				newVNode,
 				oldVNode,
 				globalContext,
-				isSvg && nodeType !== "foreignObject",
+				isSvg && nodeType !== 'foreignObject',
 				excessDomChildren,
 				commitQueue,
 				excessDomChildren
@@ -459,27 +459,27 @@ function diffElementNodes(
 		// (as above, don't diff props during hydration)
 		if (!isHydrating) {
 			if (
-				"value" in newProps &&
+				'value' in newProps &&
 				(i = newProps.value) !== undefined &&
 				// #2756 For the <progress>-element the initial value is 0,
 				// despite the attribute not being present. When the attribute
 				// is missing the progress bar is treated as indeterminate.
 				// To fix that we'll always update it when it is 0 for progress elements
 				(i !== dom.value ||
-					(nodeType === "progress" && !i) ||
+					(nodeType === 'progress' && !i) ||
 					// This is only for IE 11 to fix <select> value not being updated.
 					// To avoid a stale select value we need to set the option.value
 					// again, which triggers IE11 to re-evaluate the select value
-					(nodeType === "option" && i !== oldProps.value))
+					(nodeType === 'option' && i !== oldProps.value))
 			) {
-				setProperty(dom, "value", i, oldProps.value, false);
+				setProperty(dom, 'value', i, oldProps.value, false);
 			}
 			if (
-				"checked" in newProps &&
+				'checked' in newProps &&
 				(i = newProps.checked) !== undefined &&
 				i !== dom.checked
 			) {
-				setProperty(dom, "checked", i, oldProps.checked, false);
+				setProperty(dom, 'checked', i, oldProps.checked, false);
 			}
 		}
 	}
@@ -495,7 +495,7 @@ function diffElementNodes(
  */
 export function applyRef(ref, value, vnode) {
 	try {
-		if (typeof ref == "function") ref(value);
+		if (typeof ref == 'function') ref(value);
 		else ref.current = value;
 	} catch (e) {
 		options._catchError(e, vnode);
@@ -539,7 +539,7 @@ export function unmount(vnode, parentVNode, skipRemove) {
 				unmount(
 					r[i],
 					parentVNode,
-					skipRemove || typeof vnode.type !== "function"
+					skipRemove || typeof vnode.type !== 'function'
 				);
 			}
 		}

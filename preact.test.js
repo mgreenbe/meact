@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom";
-import { render, createElement as h, Fragment } from "./src/index.js"; //from "./node_modules/preact/dist/preact.mjs";
+// import { render, createElement as h, Fragment } from "./src/index.js"; //from "./node_modules/preact/dist/preact.mjs";
+import { render, createElement as h, Fragment } from "./meact.js";
 import { setTimeout } from "timers/promises";
 
 const observeConfig = {
@@ -238,18 +239,6 @@ test("rerender cyclic permutation of different tags", async () => {
 				target: c.outerHTML,
 				addedNodes: [i.outerHTML],
 			},
-			// {
-			// 	...objDefaults,
-			// 	type: "childList",
-			// 	target: c.outerHTML,
-			// 	removedNodes: [b.outerHTML],
-			// },
-			// {
-			// 	...objDefaults,
-			// 	type: "childList",
-			// 	target: c.outerHTML,
-			// 	addedNodes: [b.outerHTML],
-			// },
 		];
 		expect(y).toEqual(z);
 	});
@@ -460,18 +449,6 @@ test("rerender cyclic permutation of keyed list elements", async () => {
 				target: ul.outerHTML,
 				addedNodes: [li2.outerHTML],
 			},
-			// {
-			// 	...objDefaults,
-			// 	type: "childList",
-			// 	target: ul.outerHTML,
-			// 	removedNodes: [li1.outerHTML],
-			// },
-			// {
-			// 	...objDefaults,
-			// 	type: "childList",
-			// 	target: ul.outerHTML,
-			// 	addedNodes: [li1.outerHTML],
-			// },
 		];
 		expect(y).toEqual(z);
 	});

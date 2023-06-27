@@ -4,7 +4,17 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "jest": {
-    "verbose": true,
+    "reporters": [
+      [
+        "jest-compact-reporter",
+        {
+          "diffs": false,
+          "colours": true,
+          "showPassingTests": false
+        }
+      ]
+    ],
+    "verbose": false,
     "testEnvironment": "jsdom",
     "testPathIgnorePatterns": [
       "/node_modules/",
@@ -15,6 +25,7 @@
     "@testing-library/dom": "^9.3.1",
     "@testing-library/jest-dom": "^5.16.5",
     "jest": "^29.5.0",
+    "jest-compact-reporter": "^1.2.9",
     "jest-environment-jsdom": "^29.5.0"
   },
   "dependencies": {
