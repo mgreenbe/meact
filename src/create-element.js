@@ -1,6 +1,3 @@
-import { slice } from './util';
-import options from './options';
-
 let vnodeId = 0;
 
 /**
@@ -17,19 +14,21 @@ export function createElement(type, props, children) {
 		ref,
 		i;
 	for (i in props) {
-		if (i == 'key') key = props[i];
-		else if (i == 'ref') ref = props[i];
+		if (i == "key") key = props[i];
+		else if (i == "ref") ref = props[i];
 		else normalizedProps[i] = props[i];
 	}
 
 	if (arguments.length > 2) {
 		normalizedProps.children =
-			arguments.length > 3 ? slice.call(arguments, 2) : children;
+			arguments.length > 3
+				? Array.prototype.slice.call(arguments, 2)
+				: children;
 	}
 
 	// If a Component VNode, check for and apply defaultProps
 	// Note: type may be undefined in development, must never error here.
-	if (typeof type == 'function' && type.defaultProps != null) {
+	if (typeof type == "function" && type.defaultProps != null) {
 		for (i in type.defaultProps) {
 			if (normalizedProps[i] === undefined) {
 				normalizedProps[i] = type.defaultProps[i];
@@ -72,11 +71,11 @@ export function createVNode(type, props, key, ref, original) {
 		_component: null,
 		_hydrating: null,
 		constructor: undefined,
-		_original: original == null ? ++vnodeId : original
+		_original: original == null ? ++vnodeId : original,
 	};
 
 	// Only invoke the vnode hook if this was *not* a direct copy:
-	if (original == null && options.vnode != null) options.vnode(vnode);
+	// if (original == null && options.vnode != null) options.vnode(vnode);
 
 	return vnode;
 }
@@ -94,5 +93,5 @@ export function Fragment(props) {
  * @param {*} vnode
  * @returns {vnode is import('./internal').VNode}
  */
-export const isValidElement = vnode =>
+export const isValidElement = (vnode) =>
 	vnode != null && vnode.constructor === undefined;

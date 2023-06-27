@@ -1,7 +1,3 @@
-import { EMPTY_ARR } from './constants';
-
-export const isArray = Array.isArray;
-
 /**
  * Assign properties from `props` to `obj`
  * @template O, P The obj and props types
@@ -25,5 +21,3 @@ export function removeNode(node) {
 	let parentNode = node.parentNode;
 	if (parentNode) parentNode.removeChild(node);
 }
-
-export const slice = EMPTY_ARR.slice;

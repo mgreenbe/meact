@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
-// import { render, createElement as h, Fragment } from "./src/index.js"; //from "./node_modules/preact/dist/preact.mjs";
-import { render, createElement as h, Fragment } from "./meact.js";
+import { render, createElement as h, Fragment } from "./src/index.js"; //from "./node_modules/preact/dist/preact.mjs";
+// import { render, createElement as h, Fragment } from "./meact.js";
 import { setTimeout } from "timers/promises";
 
 const observeConfig = {

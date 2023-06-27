@@ -1,5 +1,5 @@
-import { assign, slice } from './util';
-import { createVNode } from './create-element';
+import { assign } from "./util";
+import { createVNode } from "./create-element";
 
 /**
  * Clones the given VNode, optionally adding attributes/props and replacing its children.
@@ -21,8 +21,8 @@ export function cloneElement(vnode, props, children) {
 	}
 
 	for (i in props) {
-		if (i == 'key') key = props[i];
-		else if (i == 'ref') ref = props[i];
+		if (i == "key") key = props[i];
+		else if (i == "ref") ref = props[i];
 		else if (props[i] === undefined && defaultProps !== undefined) {
 			normalizedProps[i] = defaultProps[i];
 		} else {
@@ -32,7 +32,9 @@ export function cloneElement(vnode, props, children) {
 
 	if (arguments.length > 2) {
 		normalizedProps.children =
-			arguments.length > 3 ? slice.call(arguments, 2) : children;
+			arguments.length > 3
+				? Array.prototype.slice.call(arguments, 2)
+				: children;
 	}
 
 	return createVNode(
