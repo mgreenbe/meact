@@ -73,16 +73,8 @@ function diffElementNodes(dom, newVNode, oldVNode) {
  * @param {import('../internal').VNode} vnode
  */
 export function applyRef(ref, value, vnode) {
-<<<<<<< HEAD
-	if (typeof ref == "function") {
-		ref(value);
-	} else {
-		ref.current = value;
-	}
-=======
 	if (typeof ref == "function") ref(value);
 	else ref.current = value;
->>>>>>> deleted
 }
 
 /**
