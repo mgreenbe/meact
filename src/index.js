@@ -9,4 +9,3 @@ export {
 export { Component } from "./component";
 export { cloneElement } from "./clone-element";
 export { createContext } from "./create-context";
-// export { toChildArray } from "./diff/children";

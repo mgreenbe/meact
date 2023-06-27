@@ -1,7 +1,7 @@
 import { EMPTY_OBJ } from "../constants";
-import { Component, getDomSibling } from "../component";
+import { getDomSibling } from "../component";
 import { diffChildren } from "./children";
-import { diffProps, setProperty } from "./props";
+import { diffProps } from "./props";
 import { removeNode } from "../util";
 
 /**
@@ -12,13 +12,9 @@ import { removeNode } from "../util";
  * @param {import('../internal').PreactElement} oldDom The current attached DOM
  */
 export function diff(parentDom, newVNode, oldVNode, oldDom) {
-	let newType = newVNode.type;
-	let newProps = newVNode.props;
+	const { type: newType, props: newProps } = newVNode;
 	if (typeof newType == "function") {
-		let c = new Component(newProps);
-		newVNode._component = c;
-		let tmp = c.render(newProps);
-		let renderResult = tmp;
+		let renderResult = newProps.children;
 		diffChildren(
 			parentDom,
 			Array.isArray(renderResult) ? renderResult : [renderResult],
@@ -37,164 +33,36 @@ export function diff(parentDom, newVNode, oldVNode, oldDom) {
  * the virtual nodes being diffed
  * @param {import('../internal').VNode} newVNode The new virtual node
  * @param {import('../internal').VNode} oldVNode The old virtual node
- * @param {object} globalContext The current context object
- * @param {boolean} isSvg Whether or not this DOM node is an SVG node
- * @param {*} excessDomChildren
- * @param {Array<import('../internal').Component>} commitQueue List of components
- * which have callbacks to invoke in commitRoot
- * @param {boolean} isHydrating Whether or not we are in hydration
  * @returns {import('../internal').PreactElement}
  */
-function diffElementNodes(
-	dom,
-	newVNode,
-	oldVNode,
-	globalContext,
-	isSvg,
-	excessDomChildren,
-	commitQueue,
-	isHydrating
-) {
+function diffElementNodes(dom, newVNode, oldVNode) {
 	let oldProps = oldVNode.props;
 	let newProps = newVNode.props;
 	let nodeType = newVNode.type;
 	let i = 0;
 
-	// Tracks entering and exiting SVG namespace when descending through the tree.
-	if (nodeType === "svg") isSvg = true;
-
-	if (excessDomChildren != null) {
-		for (; i < excessDomChildren.length; i++) {
-			const child = excessDomChildren[i];
-
-			// if newVNode matches an element in excessDomChildren or the `dom`
-			// argument matches an element in excessDomChildren, remove it from
-			// excessDomChildren so it isn't later removed in diffChildren
-			if (
-				child &&
-				"setAttribute" in child === !!nodeType &&
-				(nodeType ? child.localName === nodeType : child.nodeType === 3)
-			) {
-				dom = child;
-				excessDomChildren[i] = null;
-				break;
-			}
-		}
-	}
-
 	if (dom == null) {
 		if (nodeType === null) {
-			// @ts-ignore createTextNode returns Text, we expect PreactElement
 			return document.createTextNode(newProps);
 		}
-
-		if (isSvg) {
-			dom = document.createElementNS(
-				"http://www.w3.org/2000/svg",
-				// @ts-ignore We know `newVNode.type` is a string
-				nodeType
-			);
-		} else {
-			dom = document.createElement(
-				// @ts-ignore We know `newVNode.type` is a string
-				nodeType,
-				newProps.is && newProps
-			);
-		}
-
-		// we created a new parent, so none of the previously attached children can be reused:
-		excessDomChildren = null;
-		// we are creating a new node, so we can assume this is a new subtree (in case we are hydrating), this deopts the hydrate
-		isHydrating = false;
+		dom = document.createElement(nodeType, newProps.is && newProps);
 	}
 
 	if (nodeType === null) {
-		// During hydration, we still have to split merged text from SSR'd HTML.
-		if (oldProps !== newProps && (!isHydrating || dom.data !== newProps)) {
+		if (oldProps !== newProps) {
 			dom.data = newProps;
 		}
 	} else {
-		// If excessDomChildren was not null, repopulate it with the current element's children:
-		excessDomChildren = excessDomChildren && slice.call(dom.childNodes);
-
 		oldProps = oldVNode.props || EMPTY_OBJ;
-
-		let oldHtml = oldProps.dangerouslySetInnerHTML;
-		let newHtml = newProps.dangerouslySetInnerHTML;
-
-		// During hydration, props are not diffed at all (including dangerouslySetInnerHTML)
-		// @TODO we should warn in debug mode when props don't match here.
-		if (!isHydrating) {
-			// But, if we are in a situation where we are using existing DOM (e.g. replaceNode)
-			// we should read the existing DOM attributes to diff them
-			if (excessDomChildren != null) {
-				oldProps = {};
-				for (i = 0; i < dom.attributes.length; i++) {
-					oldProps[dom.attributes[i].name] = dom.attributes[i].value;
-				}
-			}
-
-			if (newHtml || oldHtml) {
-				// Avoid re-applying the same '__html' if it did not changed between re-render
-				if (
-					!newHtml ||
-					((!oldHtml || newHtml.__html != oldHtml.__html) &&
-						newHtml.__html !== dom.innerHTML)
-				) {
-					dom.innerHTML = (newHtml && newHtml.__html) || "";
-				}
-			}
-		}
-
-		diffProps(dom, newProps, oldProps, isSvg, isHydrating);
-
-		// If the new vnode didn't have dangerouslySetInnerHTML, diff its children
-		if (newHtml) {
-			newVNode._children = [];
-		} else {
-			i = newVNode.props.children;
-			diffChildren(
-				dom,
-				Array.isArray(i) ? i : [i],
-				newVNode,
-				oldVNode,
-				oldVNode._children && getDomSibling(oldVNode, 0)
-			);
-
-			// Remove children that are not part of any vnode.
-			if (excessDomChildren != null) {
-				for (i = excessDomChildren.length; i--; ) {
-					if (excessDomChildren[i] != null) removeNode(excessDomChildren[i]);
-				}
-			}
-		}
-
-		// (as above, don't diff props during hydration)
-		if (!isHydrating) {
-			if (
-				"value" in newProps &&
-				(i = newProps.value) !== undefined &&
-				// #2756 For the <progress>-element the initial value is 0,
-				// despite the attribute not being present. When the attribute
-				// is missing the progress bar is treated as indeterminate.
-				// To fix that we'll always update it when it is 0 for progress elements
-				(i !== dom.value ||
-					(nodeType === "progress" && !i) ||
-					// This is only for IE 11 to fix <select> value not being updated.
-					// To avoid a stale select value we need to set the option.value
-					// again, which triggers IE11 to re-evaluate the select value
-					(nodeType === "option" && i !== oldProps.value))
-			) {
-				setProperty(dom, "value", i, oldProps.value, false);
-			}
-			if (
-				"checked" in newProps &&
-				(i = newProps.checked) !== undefined &&
-				i !== dom.checked
-			) {
-				setProperty(dom, "checked", i, oldProps.checked, false);
-			}
-		}
+		diffProps(dom, newProps, oldProps);
+		i = newVNode.props.children;
+		diffChildren(
+			dom,
+			Array.isArray(i) ? i : [i],
+			newVNode,
+			oldVNode,
+			oldVNode._children && getDomSibling(oldVNode, 0)
+		);
 	}
 
 	return dom;
@@ -207,11 +75,10 @@ function diffElementNodes(
  * @param {import('../internal').VNode} vnode
  */
 export function applyRef(ref, value, vnode) {
-	try {
-		if (typeof ref == "function") ref(value);
-		else ref.current = value;
-	} catch (e) {
-		// options._catchError(e, vnode);
+	if (typeof ref == "function") {
+		ref(value);
+	} else {
+		ref.current = value;
 	}
 }
 

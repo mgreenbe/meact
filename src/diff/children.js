@@ -1,5 +1,5 @@
-import { diff, unmount, applyRef } from "./index";
-import { createVNode, Fragment } from "../create-element";
+import { diff, unmount } from "./index";
+import { createVNode } from "../create-element";
 import { EMPTY_OBJ, EMPTY_ARR } from "../constants";
 
 /**
@@ -51,9 +51,7 @@ export function diffChildren(
 			childVNode = newParentVNode._children[i] = createVNode(
 				null,
 				childVNode,
-				null,
 				null
-				// childVNode
 			);
 		} else if (childVNode._depth > 0) {
 		} else {
