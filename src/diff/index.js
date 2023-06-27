@@ -1,4 +1,3 @@
-import { EMPTY_OBJ } from "../constants";
 import { getDomSibling } from "../component";
 import { diffChildren } from "./children";
 import { diffProps } from "./props";
@@ -52,7 +51,7 @@ function diffElementNodes(dom, newVNode, oldVNode) {
 			dom.data = newProps;
 		}
 	} else {
-		oldProps = oldVNode.props || EMPTY_OBJ;
+		oldProps = oldVNode.props || {};
 		diffProps(dom, newProps, oldProps);
 		i = newVNode.props.children;
 		diffChildren(
@@ -87,8 +86,6 @@ export function applyRef(ref, value, vnode) {
  */
 export function unmount(vnode, parentVNode, skipRemove) {
 	let r;
-	// if (options.unmount) options.unmount(vnode);
-
 	if ((r = vnode.ref)) {
 		if (!r.current || r.current === vnode._dom) {
 			applyRef(r, null, parentVNode);
