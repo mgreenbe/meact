@@ -51,9 +51,7 @@ export function diffChildren(
 			childVNode = newParentVNode._children[i] = createVNode(
 				null,
 				childVNode,
-				null,
 				null
-				// childVNode
 			);
 		} else if (childVNode._depth > 0) {
 		} else {
