@@ -1,6 +1,5 @@
 import { diff, unmount } from "./index";
 import { createVNode } from "../create-element";
-import { EMPTY_OBJ, EMPTY_ARR } from "../constants";
 
 /**
  * Diff the children of a virtual node
@@ -28,7 +27,7 @@ export function diffChildren(
 
 	// This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
 	// as EMPTY_OBJ._children should be `undefined`.
-	let oldChildren = (oldParentVNode && oldParentVNode._children) || EMPTY_ARR;
+	let oldChildren = (oldParentVNode && oldParentVNode._children) || [];
 
 	let oldChildrenLength = oldChildren.length,
 		newChildrenLength = renderResult.length;
@@ -69,9 +68,9 @@ export function diffChildren(
 		const matchingIndex = findMatchingIndex(childVNode, oldChildren, i);
 
 		if (matchingIndex === -1) {
-			oldVNode = EMPTY_OBJ;
+			oldVNode = {};
 		} else {
-			oldVNode = oldChildren[matchingIndex] || EMPTY_OBJ;
+			oldVNode = oldChildren[matchingIndex] || {};
 			oldChildren[matchingIndex] = undefined;
 		}
 

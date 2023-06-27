@@ -1,4 +1,3 @@
-import { getDomSibling } from "../component";
 import { diffChildren } from "./children";
 import { diffProps } from "./props";
 import { removeNode } from "../util";
@@ -120,4 +119,19 @@ export function unmount(vnode, parentVNode, skipRemove) {
 	// Must be set to `undefined` to properly clean up `_nextDom`
 	// for which `null` is a valid value. See comment in `create-element.js`
 	vnode._parent = vnode._dom = vnode._nextDom = undefined;
+}
+
+function getDomSibling(vnode, childIndex) {
+	for (; childIndex < vnode._children.length; childIndex++) {
+		let sibling = vnode._children[childIndex];
+		if (sibling != null) {
+			return sibling._dom;
+		}
+	}
+	// If we get here, we have not found a DOM node in this vnode's children.
+	// We must resume from this vnode's sibling (in it's parent _children array)
+	// Only climb up and search the parent if we aren't searching through a DOM
+	// VNode (meaning we reached the DOM parent of the original vnode that began
+	// the search)
+	return null;
 }
