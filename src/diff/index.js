@@ -1,6 +1,5 @@
 import { diffChildren } from "./children";
 import { diffProps } from "./props";
-// import { removeNode } from "../util";
 
 /**
  * Diff two virtual nodes and apply proper changes to the DOM
@@ -10,6 +9,7 @@ import { diffProps } from "./props";
  * @param {import('../internal').PreactElement} oldDom The current attached DOM
  */
 export function diff(parentDom, newVNode, oldVNode, oldDom) {
+	debugger;
 	const { type: newType, props: newProps } = newVNode;
 	if (typeof newType == "function") {
 		let renderResult = newProps.children;
