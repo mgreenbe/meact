@@ -11,7 +11,6 @@ export function diffProps(dom, newProps, oldProps) {
 			setProperty(dom, i, null);
 		}
 	}
-
 	for (let i in newProps) {
 		if (i !== "children" && i !== "key" && oldProps[i] !== newProps[i]) {
 			setProperty(dom, i, newProps[i]);
@@ -27,6 +26,6 @@ export function diffProps(dom, newProps, oldProps) {
  */
 export function setProperty(dom, name, value) {
 	if (name in dom) {
-		dom[name] = value == null ? "" : value;
+		dom[name] = value === null ? "" : value;
 	}
 }

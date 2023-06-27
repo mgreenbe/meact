@@ -34,7 +34,6 @@ function rec2Obj(x) {
 render("Old Text", parentDom);
 
 let observer = new MutationObserver((x) => {
-	//   console.log(x);
 	const y = x.map(rec2Obj);
 	console.assert(x.length == 1);
 	const record = x[0];

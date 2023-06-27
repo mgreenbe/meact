@@ -1,6 +1,6 @@
 import { diffChildren } from "./children";
 import { diffProps } from "./props";
-import { removeNode } from "../util";
+// import { removeNode } from "../util";
 
 /**
  * Diff two virtual nodes and apply proper changes to the DOM
@@ -134,4 +134,9 @@ function getDomSibling(vnode, childIndex) {
 	// VNode (meaning we reached the DOM parent of the original vnode that began
 	// the search)
 	return null;
+}
+
+export function removeNode(node) {
+	let parentNode = node.parentNode;
+	if (parentNode) parentNode.removeChild(node);
 }
