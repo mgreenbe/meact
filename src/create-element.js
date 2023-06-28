@@ -56,6 +56,7 @@ export function createVNode(type, props, key, ref, original) {
 		type,
 		props,
 		key,
+		_children: [],
 	};
 
 	// Only invoke the vnode hook if this was *not* a direct copy:

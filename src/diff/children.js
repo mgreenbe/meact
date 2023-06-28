@@ -24,23 +24,22 @@ export function diffChildren(
 	oldDom
 ) {
 	const oldChildren = oldVNode._children || [];
-	newVNode._children = [];
+	Object.freeze(childVNodes);
 	for (let i = 0; i < childVNodes.length; i++) {
+		// Whenever we update childVNode,
 		let childVNode = childVNodes[i];
 
-		// populate newVNode._children
 		if (childVNode == null || typeof childVNode === "boolean") {
 			continue;
-		} else if (typeof childVNode == "string" || typeof childVNode == "number") {
+		}
+
+		if (typeof childVNode == "string" || typeof childVNode == "number") {
 			// turn it into a real vnode
 			childVNode = createVNode(null, childVNode, null);
-			newVNode._children[i] = childVNode;
-		} else {
-			newVNode._children[i] = childVNode;
 		}
 
 		const matchingIndex = findMatchingIndex(childVNode, oldChildren, i);
-		// childVNode and (hence) newVNode.children[i] get populated with _dom
+		// childVNode gets populated with _dom
 		diff(parentDom, childVNode, oldChildren[matchingIndex], oldDom);
 		oldChildren[matchingIndex] = undefined;
 		const newDom = childVNode._dom;
@@ -51,12 +50,27 @@ export function diffChildren(
 				oldDom = newDom.nextSibling;
 			}
 		}
+
+		newVNode._children[i] = childVNode;
 	}
 
 	// Remove remaining oldChildren if there are any.
 	for (let i = oldChildren.length; i >= 0; i--) {
 		if (oldChildren[i] != null) {
 			unmount(oldChildren[i]);
+		}
+	}
+
+	// relationship between childVNodes and newVNode._children
+	for (let i = 0; i < childVNodes.length; i++) {
+		const a = childVNodes[i];
+		const b = newVNode._children[i];
+		if (a === null || typeof a === "boolean") {
+			console.assert(b === undefined);
+		} else if (typeof a === "string" || typeof a === "number") {
+			console.assert(b.type === null);
+		} else {
+			console.assert(a === b);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 import { diff } from "./diff/index";
-import { createElement, createVNode, Fragment } from "./create-element";
+import { createElement, Fragment } from "./create-element";
 
 /**
  * Render a Preact virtual node into a DOM element
@@ -8,12 +8,9 @@ import { createElement, createVNode, Fragment } from "./create-element";
  * render into
  */
 export function render(vnode, parentDom) {
-	let oldVNode = parentDom._children;
-	// if (typeof vnode === "string") {
-	// vnode = createVNode(null, vnode, null);
-	// } else {
+	let oldVNode = parentDom._vnode;
 	vnode = createElement(Fragment, null, [vnode]);
-	// }
-	parentDom._children = vnode;
+	Object.freeze(vnode);
+	parentDom._vnode = vnode; // need _vnode property on parentDom for rerendering
 	diff(parentDom, vnode, oldVNode, parentDom.firstChild);
 }
