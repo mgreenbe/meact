@@ -5,11 +5,11 @@ import { createVNode } from "../create-element";
  * Diff the children of a virtual node
  * @param {import('../internal').PreactElement} parentDom The DOM element whose
  * children are being diffed
- * @param {import('../internal').ComponentChildren[]} renderResult
- * @param {import('../internal').VNode} newParentVNode The new virtual
- * node whose children should be diff'ed against oldParentVNode
- * @param {import('../internal').VNode} oldParentVNode The old virtual
- * node whose children should be diff'ed against newParentVNode
+ * @param {import('../internal').ComponentChildren[]} childVNodes
+ * @param {import('../internal').VNode} newVNode The new virtual
+ * node whose children should be diff'ed against oldVNode
+ * @param {import('../internal').VNode} oldVNode The old virtual
+ * node whose children should be diff'ed against newVNode
  * @param {import('../internal').PreactElement} oldDom The current attached DOM
  * element any new dom elements should be placed around. Likely `null` on first
  * render (except when hydrating). Can be a sibling DOM element when diffing
@@ -18,73 +18,34 @@ import { createVNode } from "../create-element";
  */
 export function diffChildren(
 	parentDom,
-	renderResult,
-	newParentVNode,
-	oldParentVNode,
+	childVNodes,
+	newVNode,
+	oldVNode,
 	oldDom
 ) {
-	let oldVNode, childVNode, newDom;
+	const oldChildren = oldVNode._children || [];
+	newVNode._children = [];
+	for (let i = 0; i < childVNodes.length; i++) {
+		let childVNode = childVNodes[i];
 
-	// This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
-	// as EMPTY_OBJ._children should be `undefined`.
-	let oldChildren = (oldParentVNode && oldParentVNode._children) || [];
-
-	let oldChildrenLength = oldChildren.length,
-		newChildrenLength = renderResult.length;
-
-	newParentVNode._children = [];
-	for (let i = 0; i < newChildrenLength; i++) {
-		childVNode = renderResult[i];
-
-		if (
-			childVNode == null ||
-			typeof childVNode == "boolean" ||
-			typeof childVNode == "function"
-		) {
-			childVNode = newParentVNode._children[i] = null;
-		}
-		// If this newVNode is being reused (e.g. <div>{reuse}{reuse}</div>) in the same diff,
-		// or we are rendering a component (e.g. setState) copy the oldVNodes so it can have
-		// it's own DOM & etc. pointers
-		else if (typeof childVNode == "string" || typeof childVNode == "number") {
-			childVNode = newParentVNode._children[i] = createVNode(
-				null,
-				childVNode,
-				null
-			);
-		} else if (childVNode._depth > 0) {
-		} else {
-			childVNode = newParentVNode._children[i] = childVNode;
-		}
-
-		// Terser removes the `continue` here and wraps the loop body
-		// in a `if (childVNode) { ... } condition
-		if (childVNode == null) {
+		// populate newVNode._children
+		if (childVNode == null || typeof childVNode === "boolean") {
 			continue;
+		} else if (typeof childVNode == "string" || typeof childVNode == "number") {
+			// turn it into a real vnode
+			childVNode = createVNode(null, childVNode, null);
+			newVNode._children[i] = childVNode;
+		} else {
+			newVNode._children[i] = childVNode;
 		}
-
-		childVNode._parent = newParentVNode;
 
 		const matchingIndex = findMatchingIndex(childVNode, oldChildren, i);
-
-		if (matchingIndex === -1) {
-			oldVNode = {};
-		} else {
-			oldVNode = oldChildren[matchingIndex] || {};
-			oldChildren[matchingIndex] = undefined;
-		}
-
-		// Morph the old element into the new one, but don't append it to the dom yet
-		diff(parentDom, childVNode, oldVNode, oldDom);
-
-		newDom = childVNode._dom;
-
+		// childVNode and (hence) newVNode.children[i] get populated with _dom
+		diff(parentDom, childVNode, oldChildren[matchingIndex], oldDom);
+		oldChildren[matchingIndex] = undefined;
+		const newDom = childVNode._dom;
 		if (newDom != null) {
-			let hasMatchingIndex = matchingIndex === i;
-			if (matchingIndex === i + 1) {
-				hasMatchingIndex = true;
-			}
-			if (!hasMatchingIndex) {
+			if (matchingIndex !== i + 1) {
 				oldDom = placeChild(parentDom, newDom, oldDom);
 			} else if (childVNode._nextDom === undefined) {
 				oldDom = newDom.nextSibling;
@@ -93,9 +54,9 @@ export function diffChildren(
 	}
 
 	// Remove remaining oldChildren if there are any.
-	for (let i = oldChildrenLength; i--; ) {
+	for (let i = oldChildren.length; i >= 0; i--) {
 		if (oldChildren[i] != null) {
-			unmount(oldChildren[i], oldChildren[i]);
+			unmount(oldChildren[i]);
 		}
 	}
 }

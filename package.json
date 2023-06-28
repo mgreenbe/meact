@@ -4,16 +4,6 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "jest": {
-    "reporters": [
-      [
-        "jest-compact-reporter",
-        {
-          "diffs": false,
-          "colours": true,
-          "showPassingTests": false
-        }
-      ]
-    ],
     "verbose": false,
     "testEnvironment": "jsdom",
     "testPathIgnorePatterns": [

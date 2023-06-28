@@ -353,7 +353,6 @@ test("rerender permute, add, and remove", async () => {
 	expect(count).toBe(1);
 
 	expect(c.childNodes[0]).toBe(b);
-	console.log(c.childNodes[1].tagName, c.childNodes[4].tagName);
 	expect(c.childNodes[1]).not.toBe(c.childNodes[4]);
 	expect(c.childNodes[2]).toBe(a);
 	expect(c.childNodes[3]).not.toBe(b);
@@ -435,7 +434,6 @@ test("rerender cyclic permutation of keyed list elements", async () => {
 	let observer = new MutationObserver((x) => {
 		count++;
 		const y = x.map(rec2Obj);
-		console.log(y);
 		const z = [
 			{
 				...objDefaults,

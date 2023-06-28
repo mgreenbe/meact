@@ -1,3 +1,4 @@
+import { Fragment } from "../create-element";
 import { diffChildren } from "./children";
 import { diffProps } from "./props";
 
@@ -8,18 +9,14 @@ import { diffProps } from "./props";
  * @param {import('../internal').VNode} oldVNode The old virtual node
  * @param {import('../internal').PreactElement} oldDom The current attached DOM
  */
-export function diff(parentDom, newVNode, oldVNode, oldDom) {
-	debugger;
-	const { type: newType, props: newProps } = newVNode;
-	if (typeof newType == "function") {
-		let renderResult = newProps.children;
-		diffChildren(
-			parentDom,
-			Array.isArray(renderResult) ? renderResult : [renderResult],
-			newVNode,
-			oldVNode,
-			oldDom
-		);
+export function diff(parentDom, newVNode, oldVNode = {}, oldDom = null) {
+	const {
+		type: newType,
+		props: { children },
+	} = newVNode;
+	if (newType === Fragment) {
+		const childVNodes = Array.isArray(children) ? children : [children];
+		diffChildren(parentDom, childVNodes, newVNode, oldVNode, oldDom);
 	} else {
 		newVNode._dom = diffElementNodes(oldVNode._dom, newVNode, oldVNode);
 	}
@@ -36,23 +33,25 @@ export function diff(parentDom, newVNode, oldVNode, oldDom) {
 function diffElementNodes(dom, newVNode, oldVNode) {
 	let oldProps = oldVNode.props;
 	let newProps = newVNode.props;
-	let nodeType = newVNode.type;
-	let i = 0;
+	let newType = newVNode.type;
 
 	if (dom == null) {
-		if (nodeType === null) {
+		if (newType === null) {
+			// new text node
 			return document.createTextNode(newProps);
+		} else {
+			dom = document.createElement(newType);
 		}
-		dom = document.createElement(nodeType, newProps.is && newProps);
 	}
-	if (nodeType === null) {
+	if (newType === null) {
+		// text node
 		if (oldProps !== newProps) {
 			dom.data = newProps;
 		}
 	} else {
 		oldProps = oldVNode.props || {};
 		diffProps(dom, newProps, oldProps);
-		i = newVNode.props.children;
+		let i = newVNode.props.children;
 		diffChildren(
 			dom,
 			Array.isArray(i) ? i : [i],
@@ -83,42 +82,14 @@ export function applyRef(ref, value, vnode) {
  * @param {boolean} [skipRemove] Flag that indicates that a parent node of the
  * current element is already detached from the DOM.
  */
-export function unmount(vnode, parentVNode, skipRemove) {
-	let r;
-	if ((r = vnode.ref)) {
-		if (!r.current || r.current === vnode._dom) {
-			applyRef(r, null, parentVNode);
+export function unmount(vnode) {
+	const node = vnode._dom;
+	if (node !== null) {
+		const parentNode = node.parentNode;
+		if (parentNode) {
+			parentNode.removeChild(node);
 		}
 	}
-
-	if ((r = vnode._component) != null) {
-		if (r.componentWillUnmount) {
-			r.componentWillUnmount();
-		}
-
-		r.base = r._parentDom = null;
-		vnode._component = undefined;
-	}
-
-	if ((r = vnode._children)) {
-		for (let i = 0; i < r.length; i++) {
-			if (r[i]) {
-				unmount(
-					r[i],
-					parentVNode,
-					skipRemove || typeof vnode.type !== "function"
-				);
-			}
-		}
-	}
-
-	if (!skipRemove && vnode._dom != null) {
-		removeNode(vnode._dom);
-	}
-
-	// Must be set to `undefined` to properly clean up `_nextDom`
-	// for which `null` is a valid value. See comment in `create-element.js`
-	vnode._parent = vnode._dom = vnode._nextDom = undefined;
 }
 
 function getDomSibling(vnode, childIndex) {
@@ -134,9 +105,4 @@ function getDomSibling(vnode, childIndex) {
 	// VNode (meaning we reached the DOM parent of the original vnode that began
 	// the search)
 	return null;
-}
-
-export function removeNode(node) {
-	let parentNode = node.parentNode;
-	if (parentNode) parentNode.removeChild(node);
 }

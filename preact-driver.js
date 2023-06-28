@@ -44,4 +44,4 @@ let observer = new MutationObserver((x) => {
 });
 observer.observe(parentDom, observeConfig);
 
-render("New Text", parentDom);
+// render("New Text", parentDom);
