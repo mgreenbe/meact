@@ -100,26 +100,26 @@ function renderComponent(component) {
 		);
 		commitRoot(commitQueue, vnode);
 
-		if (vnode._dom != oldDom) {
-			updateParentDomPointers(vnode);
-		}
+		// if (vnode._dom != oldDom) {
+		// 	// updateParentDomPointers(vnode);
+		// }
 	}
 }
 
-/**
- * @param {import('./_internal').VNode} vnode
- */
-function updateParentDomPointers(vnode) {
-	if ((vnode = vnode._parent) != null && vnode._component != null) {
-		vnode._dom = vnode._component.base = null;
-		for (let i = 0; i < vnode._children.length; i++) {
-			let child = vnode._children[i];
-			if (child != null && child._dom != null) {
-				vnode._dom = vnode._component.base = child._dom;
-				break;
-			}
-		}
+// /**
+//  * @param {import('./_internal').VNode} vnode
+//  */
+// function updateParentDomPointers(vnode) {
+// 	if ((vnode = vnode._parent) != null && vnode._component != null) {
+// 		vnode._dom = vnode._component.base = null;
+// 		for (let i = 0; i < vnode._children.length; i++) {
+// 			let child = vnode._children[i];
+// 			if (child != null && child._dom != null) {
+// 				vnode._dom = vnode._component.base = child._dom;
+// 				break;
+// 			}
+// 		}
 
-		return updateParentDomPointers(vnode);
-	}
-}
+// 		return updateParentDomPointers(vnode);
+// 	}
+// }
