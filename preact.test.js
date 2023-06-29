@@ -1,5 +1,10 @@
 import "@testing-library/jest-dom";
-import { render, createElement as h, Fragment } from "./src/index.js"; //from "./node_modules/preact/dist/preact.mjs";
+import {
+	render,
+	createElement as h,
+	Fragment,
+	Component,
+} from "./src/index.js"; //from "./node_modules/preact/dist/preact.mjs";
 // import { render, createElement as h, Fragment } from "./meact.js";
 import { setTimeout } from "timers/promises";
 
@@ -725,4 +730,49 @@ test("simple site", () => {
 	expect(c.innerHTML).toBe(
 		`<div><nav><a href="/">Home</a><hr></nav><article>Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...</article><footer><hr><p><i>(c) Me 2023</i></p></footer></div>`
 	);
+});
+
+test("counter component", async () => {
+	let c = document.createElement("div");
+
+	class Counter extends Component {
+		state = { value: 0 };
+
+		handleClick = (e) => {
+			this.setState({ value: this.state.value + 1 });
+		};
+
+		render() {
+			return h("div", {}, [
+				h("h2", {}, `Count: ${this.state.value}`),
+				h("button", { onClick: this.handleClick }, "Increment"),
+			]);
+		}
+	}
+
+	render(h(Counter), c);
+
+	expect(c.innerHTML).toBe(
+		"<div><h2>Count: 0</h2><button>Increment</button></div>"
+	);
+	const button = c.querySelector("button");
+	button.click();
+	await setTimeout(17);
+	expect(c.innerHTML).toBe(
+		"<div><h2>Count: 1</h2><button>Increment</button></div>"
+	);
+	button.click();
+	await setTimeout(17);
+	button.click();
+	await setTimeout(17);
+	expect(c.innerHTML).toBe(
+		"<div><h2>Count: 3</h2><button>Increment</button></div>"
+	);
+
+	button.click();
+	button.click();
+	await setTimeout(17);
+	expect(c.innerHTML).toBe(
+		"<div><h2>Count: 4</h2><button>Increment</button></div>"
+	); // debounced
 });
