@@ -1,24 +1,24 @@
-import { enqueueRender } from './component';
+import { enqueueRender } from "./component";
 
 export let i = 0;
 
 export function createContext(defaultValue, contextId) {
-	contextId = '__cC' + i++;
+	contextId = "__cC" + i++;
 
 	const context = {
 		_id: contextId,
 		_defaultValue: defaultValue,
-		/** @type {import('./internal').FunctionComponent} */
+		/** @type {import('./_internal').FunctionComponent} */
 		Consumer(props, contextValue) {
 			// return props.children(
 			// 	context[contextId] ? context[contextId].props.value : defaultValue
 			// );
 			return props.children(contextValue);
 		},
-		/** @type {import('./internal').FunctionComponent} */
+		/** @type {import('./_internal').FunctionComponent} */
 		Provider(props) {
 			if (!this.getChildContext) {
-				/** @type {import('./internal').Component[]} */
+				/** @type {import('./_internal').Component[]} */
 				let subs = [];
 				let ctx = {};
 				ctx[contextId] = this;
@@ -41,14 +41,14 @@ export function createContext(defaultValue, contextId) {
 						// 	c.context[contextId] = _props.value;
 						// 	enqueueRender(c);
 						// });
-						subs.some(c => {
+						subs.some((c) => {
 							c._force = true;
 							enqueueRender(c);
 						});
 					}
 				};
 
-				this.sub = c => {
+				this.sub = (c) => {
 					subs.push(c);
 					let old = c.componentWillUnmount;
 					c.componentWillUnmount = () => {
@@ -59,7 +59,7 @@ export function createContext(defaultValue, contextId) {
 			}
 
 			return props.children;
-		}
+		},
 	};
 
 	// Devtools needs access to the context object when it

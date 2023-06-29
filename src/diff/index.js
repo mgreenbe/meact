@@ -4,19 +4,18 @@ import { Fragment } from "../create-element";
 import { diffChildren } from "./children";
 import { diffProps, setProperty } from "./props";
 import { assign, isArray, removeNode } from "../util";
-import options from "../options";
 
 /**
  * Diff two virtual nodes and apply proper changes to the DOM
- * @param {import('../internal').PreactElement} parentDom The parent of the DOM element
- * @param {import('../internal').VNode} newVNode The new virtual node
- * @param {import('../internal').VNode} oldVNode The old virtual node
+ * @param {import('../_internal').PreactElement} parentDom The parent of the DOM element
+ * @param {import('../_internal').VNode} newVNode The new virtual node
+ * @param {import('../_internal').VNode} oldVNode The old virtual node
  * @param {object} globalContext The current context object. Modified by getChildContext
  * @param {boolean} isSvg Whether or not this element is an SVG node
- * @param {Array<import('../internal').PreactElement>} excessDomChildren
- * @param {Array<import('../internal').Component>} commitQueue List of components
+ * @param {Array<import('../_internal').PreactElement>} excessDomChildren
+ * @param {Array<import('../_internal').Component>} commitQueue List of components
  * which have callbacks to invoke in commitRoot
- * @param {import('../internal').PreactElement} oldDom The current attached DOM
+ * @param {import('../_internal').PreactElement} oldDom The current attached DOM
  * element any new dom elements should be placed around. Likely `null` on first
  * render (except when hydrating). Can be a sibling DOM element when diffing
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
@@ -227,9 +226,9 @@ export function diff(
 }
 
 /**
- * @param {Array<import('../internal').Component>} commitQueue List of components
+ * @param {Array<import('../_internal').Component>} commitQueue List of components
  * which have callbacks to invoke in commitRoot
- * @param {import('../internal').VNode} root
+ * @param {import('../_internal').VNode} root
  */
 export function commitRoot(commitQueue, root) {
 	commitQueue.some((c) => {
@@ -245,17 +244,17 @@ export function commitRoot(commitQueue, root) {
 
 /**
  * Diff two virtual nodes representing DOM element
- * @param {import('../internal').PreactElement} dom The DOM element representing
+ * @param {import('../_internal').PreactElement} dom The DOM element representing
  * the virtual nodes being diffed
- * @param {import('../internal').VNode} newVNode The new virtual node
- * @param {import('../internal').VNode} oldVNode The old virtual node
+ * @param {import('../_internal').VNode} newVNode The new virtual node
+ * @param {import('../_internal').VNode} oldVNode The old virtual node
  * @param {object} globalContext The current context object
  * @param {boolean} isSvg Whether or not this DOM node is an SVG node
  * @param {*} excessDomChildren
- * @param {Array<import('../internal').Component>} commitQueue List of components
+ * @param {Array<import('../_internal').Component>} commitQueue List of components
  * which have callbacks to invoke in commitRoot
  * @param {boolean} isHydrating Whether or not we are in hydration
- * @returns {import('../internal').PreactElement}
+ * @returns {import('../_internal').PreactElement}
  */
 function diffElementNodes(
 	dom,
@@ -360,8 +359,8 @@ function diffElementNodes(
 
 /**
  * Unmount a virtual node from the tree and apply DOM changes
- * @param {import('../internal').VNode} vnode The virtual node to unmount
- * @param {import('../internal').VNode} parentVNode The parent of the VNode that
+ * @param {import('../_internal').VNode} vnode The virtual node to unmount
+ * @param {import('../_internal').VNode} parentVNode The parent of the VNode that
  * initiated the unmount
  * @param {boolean} [skipRemove] Flag that indicates that a parent node of the
  * current element is already detached from the DOM.
@@ -372,7 +371,6 @@ export function unmount(vnode, parentVNode, skipRemove) {
 	if ((r = vnode._component) != null) {
 		if (r.componentWillUnmount) {
 			r.componentWillUnmount();
-			options._catchError(e, parentVNode);
 		}
 
 		r.base = r._parentDom = null;

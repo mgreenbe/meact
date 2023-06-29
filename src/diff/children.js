@@ -5,19 +5,19 @@ import { isArray } from "../util";
 
 /**
  * Diff the children of a virtual node
- * @param {import('../internal').PreactElement} parentDom The DOM element whose
+ * @param {import('../_internal').PreactElement} parentDom The DOM element whose
  * children are being diffed
- * @param {import('../internal').ComponentChildren[]} renderResult
- * @param {import('../internal').VNode} newParentVNode The new virtual
+ * @param {import('../_internal').ComponentChildren[]} renderResult
+ * @param {import('../_internal').VNode} newParentVNode The new virtual
  * node whose children should be diff'ed against oldParentVNode
- * @param {import('../internal').VNode} oldParentVNode The old virtual
+ * @param {import('../_internal').VNode} oldParentVNode The old virtual
  * node whose children should be diff'ed against newParentVNode
  * @param {object} globalContext The current context object - modified by getChildContext
  * @param {boolean} isSvg Whether or not this DOM node is an SVG node
- * @param {Array<import('../internal').PreactElement>} excessDomChildren
- * @param {Array<import('../internal').Component>} commitQueue List of components
+ * @param {Array<import('../_internal').PreactElement>} excessDomChildren
+ * @param {Array<import('../_internal').Component>} commitQueue List of components
  * which have callbacks to invoke in commitRoot
- * @param {import('../internal').PreactElement} oldDom The current attached DOM
+ * @param {import('../_internal').PreactElement} oldDom The current attached DOM
  * element any new dom elements should be placed around. Likely `null` on first
  * render (except when hydrating). Can be a sibling DOM element when diffing
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
@@ -234,7 +234,7 @@ function reorderChildren(childVNode, oldDom, parentDom) {
  * Flatten and loop through the children of a virtual node
  * @param {import('../index').ComponentChildren} children The unflattened
  * children of a virtual node
- * @returns {import('../internal').VNode[]}
+ * @returns {import('../_internal').VNode[]}
  */
 export function toChildArray(children, out) {
 	out = out || [];
@@ -260,8 +260,8 @@ function placeChild(parentDom, newDom, oldDom) {
 }
 
 /**
- * @param {import('../internal').VNode | string} childVNode
- * @param {import('../internal').VNode[]} oldChildren
+ * @param {import('../_internal').VNode | string} childVNode
+ * @param {import('../_internal').VNode[]} oldChildren
  * @param {number} skewedIndex
  * @param {number} remainingOldChildren
  * @returns {number}

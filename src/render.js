@@ -4,10 +4,10 @@ import { createElement, Fragment } from "./create-element";
 
 /**
  * Render a Preact virtual node into a DOM element
- * @param {import('./internal').ComponentChild} vnode The virtual node to render
- * @param {import('./internal').PreactElement} parentDom The DOM element to
+ * @param {import('./_internal').ComponentChild} vnode The virtual node to render
+ * @param {import('./_internal').PreactElement} parentDom The DOM element to
  * render into
- * @param {import('./internal').PreactElement | object} [replaceNode] Optional: Attempt to re-use an
+ * @param {import('./_internal').PreactElement | object} [replaceNode] Optional: Attempt to re-use an
  * existing DOM tree rooted at `replaceNode`
  */
 export function render(vnode, parentDom) {
@@ -36,8 +36,8 @@ export function render(vnode, parentDom) {
 
 /**
  * Update an existing DOM element with data from a Preact virtual node
- * @param {import('./internal').ComponentChild} vnode The virtual node to render
- * @param {import('./internal').PreactElement} parentDom The DOM element to
+ * @param {import('./_internal').ComponentChild} vnode The virtual node to render
+ * @param {import('./_internal').PreactElement} parentDom The DOM element to
  * update
  */
 export function hydrate(vnode, parentDom) {
