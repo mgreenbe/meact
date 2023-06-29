@@ -57,5 +57,35 @@ class App extends Component {
 
 let scratch = parentDom;
 
-render(h("span", {}), scratch);
-render(h("span", {}, "Hello!"), scratch);
+let trigger;
+class A extends Component {
+	constructor() {
+		super();
+		trigger = this.handleClick;
+	}
+	state = { show: false };
+
+	handleClick = (e) => {
+		this.setState({ show: !this.state.show });
+	};
+
+	render() {
+		return h("div", {}, [
+			h("p", {}, "B"),
+			this.state.show ? h("div", {}, "A") : null,
+		]);
+	}
+}
+
+render(h(A), scratch);
+console.log(scratch.innerHTML);
+setTimeout(trigger, 1000);
+setTimeout(() => console.log(scratch.innerHTML), 2000);
+
+// toggleShow();
+// increment();
+// expect(scratch.innerHTML).to.equal("<div><p>B</p></div>");
+
+// trigger();
+// rerender();
+// expect(scratch.innerHTML).to.equal("<div><div>A</div><p>B</p></div>");
