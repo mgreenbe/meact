@@ -12,25 +12,10 @@ import { slice } from "./util";
  * @param {import('./internal').PreactElement | object} [replaceNode] Optional: Attempt to re-use an
  * existing DOM tree rooted at `replaceNode`
  */
-export function render(vnode, parentDom, replaceNode) {
-	if (options._root) options._root(vnode, parentDom);
+export function render(vnode, parentDom) {
+	let oldVNode = parentDom._children;
 
-	// We abuse the `replaceNode` parameter in `hydrate()` to signal if we are in
-	// hydration mode or not by passing the `hydrate` function instead of a DOM
-	// element..
-	let isHydrating = typeof replaceNode === "function";
-
-	// To be able to support calling `render()` multiple times on the same
-	// DOM node, we need to obtain a reference to the previous tree. We do
-	// this by assigning a new `_children` property to DOM nodes which points
-	// to the last rendered tree. By default this property is not present, which
-	// means that we are mounting a new tree for the first time.
-	let oldVNode = isHydrating
-		? null
-		: (replaceNode && replaceNode._children) || parentDom._children;
-
-	vnode = ((!isHydrating && replaceNode) || parentDom)._children =
-		createElement(Fragment, null, [vnode]);
+	vnode = parentDom._children = createElement(Fragment, null, [vnode]);
 
 	// List of effects that need to be called after diffing.
 	let commitQueue = [];
@@ -40,22 +25,11 @@ export function render(vnode, parentDom, replaceNode) {
 		// our custom `_children` property.
 		vnode,
 		oldVNode || EMPTY_OBJ,
-		EMPTY_OBJ,
-		parentDom.ownerSVGElement !== undefined,
-		!isHydrating && replaceNode
-			? [replaceNode]
-			: oldVNode
-			? null
-			: parentDom.firstChild
-			? slice.call(parentDom.childNodes)
-			: null,
+		undefined,
+		undefined,
+		undefined,
 		commitQueue,
-		!isHydrating && replaceNode
-			? replaceNode
-			: oldVNode
-			? oldVNode._dom
-			: parentDom.firstChild,
-		isHydrating
+		oldVNode ? oldVNode._dom : parentDom.firstChild
 	);
 
 	// Flush all queued effects
