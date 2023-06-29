@@ -57,26 +57,5 @@ class App extends Component {
 
 let scratch = parentDom;
 
-let reused = h("div", {
-	class: "reuse",
-	children: "Hello World!",
-});
-let x = h("div", {
-	children: [reused, h("hr", {}), reused],
-});
-console.log(x);
-render(x, scratch);
-// expect(serializeHtml(scratch)).toBe(
-// 	`<div><div class="reuse">Hello World!</div><hr><div class="reuse">Hello World!</div></div>`
-// );
-
-setTimeout(() => {
-	let y = h("div", {
-		children: [h("hr", {}), reused],
-	});
-	console.log(y);
-	render(y, scratch);
-}, 100);
-// expect(serializeHtml(scratch)).toBe(
-// 	`<div><hr><div class="reuse">Hello World!</div></div>`
-// );
+render(h("span", {}), scratch);
+render(h("span", {}, "Hello!"), scratch);

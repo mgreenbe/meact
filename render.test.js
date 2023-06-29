@@ -114,9 +114,25 @@ it("should allow VNode reuse", () => {
 	const x = h("div", {
 		children: [h("hr", {}), reused],
 	});
-	console.log(x);
 	render(x, scratch);
 	expect(serializeHtml(scratch)).toBe(
 		`<div><hr><div class="reuse">Hello World!</div></div>`
 	);
+});
+
+it.skip("should merge new elements when called multiple times", () => {
+	render(h("div"), scratch);
+	expect(scratch.childNodes).toHaveLength(1);
+	expect(scratch.firstChild).toHaveProperty("nodeName", "DIV");
+	expect(scratch.innerHTML).toBe("<div></div>");
+
+	render(h("span"), scratch);
+	expect(scratch.childNodes).toHaveLength(1);
+	expect(scratch.firstChild).toHaveProperty("nodeName", "SPAN");
+	expect(scratch.innerHTML).toBe("<span></span>");
+
+	render(h("span", {}, "Hello!"), scratch);
+	expect(scratch.childNodes).toHaveLength(1);
+	expect(scratch.firstChild).toHaveProperty("nodeName", "SPAN");
+	expect(scratch.innerHTML).toBe("<span>Hello!</span>"); // fails
 });
