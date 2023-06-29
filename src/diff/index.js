@@ -359,21 +359,6 @@ function diffElementNodes(
 }
 
 /**
- * Invoke or update a ref, depending on whether it is a function or object ref.
- * @param {object|function} ref
- * @param {any} value
- * @param {import('../internal').VNode} vnode
- */
-export function applyRef(ref, value, vnode) {
-	try {
-		if (typeof ref == "function") ref(value);
-		else ref.current = value;
-	} catch (e) {
-		options._catchError(e, vnode);
-	}
-}
-
-/**
  * Unmount a virtual node from the tree and apply DOM changes
  * @param {import('../internal').VNode} vnode The virtual node to unmount
  * @param {import('../internal').VNode} parentVNode The parent of the VNode that
