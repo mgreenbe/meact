@@ -78,6 +78,18 @@ export function diffChildren(
 				null,
 				null
 			);
+		} else if (childVNode._depth > 0) {
+			// VNode is already in use, clone it. This can happen in the following
+			// scenario:
+			//   const reuse = <div />
+			//   <div>{reuse}<span />{reuse}</div>
+			childVNode = newParentVNode._children[i] = createVNode(
+				childVNode.type,
+				childVNode.props,
+				childVNode.key,
+				childVNode.ref ? childVNode.ref : null,
+				childVNode._original
+			);
 		} else {
 			childVNode = newParentVNode._children[i] = childVNode;
 		}
@@ -89,6 +101,7 @@ export function diffChildren(
 		}
 
 		childVNode._parent = newParentVNode;
+		childVNode._depth = newParentVNode._depth + 1;
 
 		const matchingIndex = findMatchingIndex(
 			childVNode,

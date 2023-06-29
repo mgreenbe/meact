@@ -106,6 +106,11 @@ function renderComponent(component) {
 	}
 }
 
+/**
+ * @param {import('./internal').Component} a
+ * @param {import('./internal').Component} b
+ */
+
 // /**
 //  * @param {import('./_internal').VNode} vnode
 //  */
