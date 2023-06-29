@@ -1,4 +1,5 @@
-import { IS_NON_DIMENSIONAL } from "../constants";
+const IS_NON_DIMENSIONAL =
+	/acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
 
 /**
  * Diff the old and new properties of a VNode and apply changes to the DOM node

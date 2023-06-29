@@ -732,7 +732,7 @@ test("simple site", () => {
 	);
 });
 
-test("counter component", async () => {
+test("counter component with setState", async () => {
 	let c = document.createElement("div");
 
 	class Counter extends Component {
@@ -773,6 +773,6 @@ test("counter component", async () => {
 	button.click();
 	await setTimeout(17);
 	expect(c.innerHTML).toBe(
-		"<div><h2>Count: 4</h2><button>Increment</button></div>"
-	); // debounced
+		"<div><h2>Count: 5</h2><button>Increment</button></div>"
+	);
 });

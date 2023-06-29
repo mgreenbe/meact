@@ -1,4 +1,3 @@
-import { EMPTY_OBJ } from "./constants";
 import { commitRoot, diff } from "./diff/index";
 import { createElement, Fragment } from "./create-element";
 
@@ -22,7 +21,7 @@ export function render(vnode, parentDom) {
 		// Determine the new vnode tree and store it on the DOM element on
 		// our custom `_children` property.
 		vnode,
-		oldVNode || EMPTY_OBJ,
+		oldVNode || {},
 		undefined,
 		undefined,
 		undefined,

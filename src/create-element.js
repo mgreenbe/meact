@@ -1,6 +1,3 @@
-import { slice } from "./util";
-import options from "./options";
-
 let vnodeId = 0;
 
 /**
@@ -24,7 +21,9 @@ export function createElement(type, props, children) {
 
 	if (arguments.length > 2) {
 		normalizedProps.children =
-			arguments.length > 3 ? slice.call(arguments, 2) : children;
+			arguments.length > 3
+				? Array.prototype.slice.call(arguments, 2)
+				: children;
 	}
 
 	// If a Component VNode, check for and apply defaultProps
@@ -76,7 +75,6 @@ export function createVNode(type, props, key, ref, original) {
 	};
 
 	// Only invoke the vnode hook if this was *not* a direct copy:
-	if (original == null && options.vnode != null) options.vnode(vnode);
 
 	return vnode;
 }

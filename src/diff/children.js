@@ -1,7 +1,5 @@
 import { diff, unmount } from "./index";
 import { createVNode, Fragment } from "../create-element";
-import { EMPTY_OBJ, EMPTY_ARR } from "../constants";
-import { isArray } from "../util";
 
 /**
  * Diff the children of a virtual node
@@ -37,9 +35,9 @@ export function diffChildren(
 ) {
 	let i, j, oldVNode, childVNode, newDom, firstChildDom, refs;
 
-	// This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
-	// as EMPTY_OBJ._children should be `undefined`.
-	let oldChildren = (oldParentVNode && oldParentVNode._children) || EMPTY_ARR;
+	// This is a compression of oldParentVNode!=null && oldParentVNode != {} && oldParentVNode._children || []
+	// as {}._children should be `undefined`.
+	let oldChildren = (oldParentVNode && oldParentVNode._children) || [];
 
 	let oldChildrenLength = oldChildren.length,
 		remainingOldChildren = oldChildrenLength,
@@ -72,7 +70,7 @@ export function diffChildren(
 				null,
 				childVNode
 			);
-		} else if (isArray(childVNode)) {
+		} else if (Array.isArray(childVNode)) {
 			childVNode = newParentVNode._children[i] = createVNode(
 				Fragment,
 				{ children: childVNode },
@@ -100,9 +98,9 @@ export function diffChildren(
 		);
 
 		if (matchingIndex === -1) {
-			oldVNode = EMPTY_OBJ;
+			oldVNode = {};
 		} else {
-			oldVNode = oldChildren[matchingIndex] || EMPTY_OBJ;
+			oldVNode = oldChildren[matchingIndex] || {};
 			oldChildren[matchingIndex] = undefined;
 			remainingOldChildren--;
 		}
@@ -133,7 +131,7 @@ export function diffChildren(
 				firstChildDom = newDom;
 			}
 
-			let isMounting = oldVNode === EMPTY_OBJ || oldVNode._original === null;
+			let isMounting = oldVNode === {} || oldVNode._original === null;
 			let hasMatchingIndex = !isMounting && matchingIndex === i;
 			if (matchingIndex !== i) {
 				if (matchingIndex === i + 1) {
@@ -239,7 +237,7 @@ function reorderChildren(childVNode, oldDom, parentDom) {
 export function toChildArray(children, out) {
 	out = out || [];
 	if (children == null || typeof children == "boolean") {
-	} else if (isArray(children)) {
+	} else if (Array.isArray(children)) {
 		children.some((child) => {
 			toChildArray(child, out);
 		});

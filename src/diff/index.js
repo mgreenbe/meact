@@ -1,9 +1,7 @@
-import { EMPTY_OBJ } from "../constants";
 import { Component, getDomSibling } from "../component";
 import { Fragment } from "../create-element";
 import { diffChildren } from "./children";
 import { diffProps, setProperty } from "./props";
-import { assign, isArray, removeNode } from "../util";
 
 /**
  * Diff two virtual nodes and apply proper changes to the DOM
@@ -69,10 +67,10 @@ export function diff(
 
 		if (newType.getDerivedStateFromProps != null) {
 			if (c._nextState == c.state) {
-				c._nextState = assign({}, c._nextState);
+				c._nextState = { ...c._nextState };
 			}
 
-			assign(
+			Object.assign(
 				c._nextState,
 				newType.getDerivedStateFromProps(newProps, c._nextState)
 			);
@@ -188,7 +186,7 @@ export function diff(
 
 		diffChildren(
 			parentDom,
-			isArray(renderResult) ? renderResult : [renderResult],
+			Array.isArray(renderResult) ? renderResult : [renderResult],
 			newVNode,
 			oldVNode,
 			undefined,
@@ -293,7 +291,7 @@ function diffElementNodes(
 		}
 	} else {
 		// If excessDomChildren was not null, repopulate it with the current element's children:
-		oldProps = oldVNode.props || EMPTY_OBJ;
+		oldProps = oldVNode.props || {};
 
 		// During hydration, props are not diffed at all (including dangerouslySetInnerHTML)
 		// @TODO we should warn in debug mode when props don't match here.
@@ -317,7 +315,7 @@ function diffElementNodes(
 		i = newVNode.props.children;
 		diffChildren(
 			dom,
-			isArray(i) ? i : [i],
+			Array.isArray(i) ? i : [i],
 			newVNode,
 			oldVNode,
 			undefined,
@@ -390,7 +388,10 @@ export function unmount(vnode, parentVNode, skipRemove) {
 	}
 
 	if (!skipRemove && vnode._dom != null) {
-		removeNode(vnode._dom);
+		const parentNode = vnode._dom.parentNode;
+		if (parentNode) {
+			parentNode.removeChild(vnode._dom);
+		}
 	}
 
 	// Must be set to `undefined` to properly clean up `_nextDom`
