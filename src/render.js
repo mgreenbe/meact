@@ -1,8 +1,6 @@
 import { EMPTY_OBJ } from "./constants";
 import { commitRoot, diff } from "./diff/index";
 import { createElement, Fragment } from "./create-element";
-import options from "./options";
-import { slice } from "./util";
 
 /**
  * Render a Preact virtual node into a DOM element
